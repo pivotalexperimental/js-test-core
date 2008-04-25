@@ -1,6 +1,6 @@
 require File.expand_path("#{File.dirname(__FILE__)}/../unit_spec_helper")
 
-module JsSpec
+module JsTestCore
   describe Server do
     attr_reader :result
     
@@ -35,9 +35,9 @@ module JsSpec
         lambda { get("/specs/nonexistent") }.should raise_error
       end
 
-      specify "'/core/JSSpec.js', returns the contents of the file" do
-        response = get("/core/JSSpec.js")
-        response.body.should == ::File.read("#{Server.core_path}/JSSpec.js")
+      specify "'/core/JsTestCore.js', returns the contents of the file" do
+        response = get("/core/JsTestCore.js")
+        response.body.should == ::File.read("#{Server.core_path}/JsTestCore.js")
       end
 
       specify "'/stylesheets/example.css', returns the contents of the file" do
@@ -64,7 +64,7 @@ module JsSpec
         port = DEFAULT_PORT
 
         mock(EventMachine).run.yields
-        mock(EventMachine).start_server(host, port, ::Thin::JsSpecConnection)
+        mock(EventMachine).start_server(host, port, ::Thin::JsTestCoreConnection)
 
         Server.run(spec_root_path, implementation_root_path, public_path)
       end
@@ -74,7 +74,7 @@ module JsSpec
         port = 80
 
         mock(EventMachine).run.yields
-        mock(EventMachine).start_server(host, port, ::Thin::JsSpecConnection)
+        mock(EventMachine).start_server(host, port, ::Thin::JsTestCoreConnection)
 
         Server.run(spec_root_path, implementation_root_path, public_path, {:Host => host, :Port => port})
       end
@@ -99,14 +99,14 @@ module JsSpec
     end
 
     describe ".core_path" do
-      it "returns the expanded path to the JsSpec core directory" do
+      it "returns the expanded path to the JsTestCore core directory" do
         dir = ::File.dirname(__FILE__)
         Server.core_path.should == ::File.expand_path("#{dir}/../../../core")
       end
     end
 
     describe ".implementation_root_path" do
-      it "returns the expanded path to the JsSpec implementations directory" do
+      it "returns the expanded path to the JsTestCore implementations directory" do
         dir = ::File.dirname(__FILE__)
         Server.implementation_root_path.should == implementation_root_path
       end

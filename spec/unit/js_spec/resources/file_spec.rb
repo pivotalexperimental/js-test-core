@@ -1,6 +1,6 @@
 require File.expand_path("#{File.dirname(__FILE__)}/../../unit_spec_helper")
 
-module JsSpec
+module JsTestCore
   module Resources
     describe File do
     attr_reader :request, :file
@@ -58,11 +58,11 @@ module JsSpec
           end
 
           def absolute_path
-            "#{core_path}/JSSpec.css"
+            "#{core_path}/JsTestCore.css"
           end
 
           def relative_path
-            "/core/JSSpec.css"
+            "/core/JsTestCore.css"
           end
         end
       end

@@ -1,6 +1,6 @@
 require File.expand_path("#{File.dirname(__FILE__)}/../../unit_spec_helper")
 
-module JsSpec
+module JsTestCore
   module Resources
     describe Dir do
     attr_reader :dir, :absolute_path, :relative_path
@@ -14,9 +14,9 @@ module JsSpec
 
       describe "#locate when passed a name of a real file" do
         it "returns a Resources::File representing it" do
-          file = dir.locate("JSSpec.css")
-          file.relative_path.should == "/core/JSSpec.css"
-          file.absolute_path.should == "#{core_path}/JSSpec.css"
+          file = dir.locate("JsTestCore.css")
+          file.relative_path.should == "/core/JsTestCore.css"
+          file.absolute_path.should == "#{core_path}/JsTestCore.css"
         end
       end
     end

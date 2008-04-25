@@ -1,6 +1,6 @@
 require File.expand_path("#{File.dirname(__FILE__)}/../unit_spec_helper")
 
-module JsSpec
+module JsTestCore
   describe RailsServer do
     it "subclasses Server" do
       RailsServer.superclass.should == Server
@@ -26,7 +26,7 @@ module JsSpec
         end
 
         mock(EventMachine).run.yields
-        mock(EventMachine).start_server(host, port, ::Thin::JsSpecConnection)
+        mock(EventMachine).start_server(host, port, ::Thin::JsTestCoreConnection)
         RailsServer.run(rails_root)
         Server.instance.should == server_instance
       end

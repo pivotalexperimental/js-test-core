@@ -1,11 +1,11 @@
 require File.expand_path("#{File.dirname(__FILE__)}/../unit_spec_helper")
 
 module Thin
-  describe JsSpecConnection do
+  describe JsTestCoreConnection do
     describe "#process" do
       attr_reader :connection, :result
       before do
-        @connection = JsSpecConnection.new('signature')
+        @connection = JsTestCoreConnection.new('signature')
         stub(connection).socket_address {'0.0.0.0'}
 
         @result = ""

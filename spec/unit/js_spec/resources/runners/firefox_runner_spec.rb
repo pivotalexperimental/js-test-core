@@ -1,6 +1,6 @@
 require File.expand_path("#{File.dirname(__FILE__)}/../../../unit_spec_helper")
 
-module JsSpec
+module JsTestCore
   module Resources
     describe Runners::FirefoxRunner do
       attr_reader :runner, :request, :response, :driver

@@ -1,6 +1,6 @@
 require File.expand_path("#{File.dirname(__FILE__)}/../unit_spec_helper")
 
-module JsSpec
+module JsTestCore
   describe Client do
     describe '.run' do
       describe 'when successful' do

@@ -25,8 +25,8 @@ def run_suite
   system("ruby #{dir}/spec/spec_suite.rb") || raise("Example Suite failed")
 end
 
-PKG_NAME = "js_spec"
-PKG_VERSION = "0.2.1"
+PKG_NAME = "js_test_core"
+PKG_VERSION = "0.1.0"
 PKG_FILES = FileList[
   '[A-Z]*',
   '*.rb',
@@ -39,13 +39,12 @@ PKG_FILES = FileList[
 spec = Gem::Specification.new do |s|
   s.name = PKG_NAME
   s.version = PKG_VERSION
-  s.summary = "The JSSpec client library (http://code.google.com/p/jsspec/) plus a convenient ruby server."
+  s.summary = "The JsTestCore library is the core javascript test server library used by several JS Test server libraries."
   s.test_files = "spec/spec_suite.rb"
   s.description = s.summary
 
   s.files = PKG_FILES.to_a
   s.require_path = 'lib'
-  s.executables = ['js_spec', 'js_spec_server']
 
   s.has_rdoc = true
   s.extra_rdoc_files = [ "README", "CHANGES" ]
@@ -53,7 +52,7 @@ spec = Gem::Specification.new do |s|
 
   s.test_files = Dir.glob('spec/*_spec.rb')
   s.require_path = 'lib'
-  s.author = "Brian Takita & Nathan Sobo"
+  s.author = "Brian Takita"
   s.email = "brian@pivotallabs.com"
   s.homepage = "http://pivotallabs.com"
   s.rubyforge_project = "pivotalrb"
@@ -70,5 +69,5 @@ end
 def tag_release
   dashed_version = PKG_VERSION.gsub('.', '-')
   svn_user = "#{ENV["SVN_USER"]}@" || ""
-  `svn cp svn+ssh://#{svn_user}rubyforge.org/var/svn/pivotalrb/js_spec/trunk svn+ssh://#{svn_user}rubyforge.org/var/svn/pivotalrb/js_spec/tags/REL-#{dashed_version} -m 'Version #{PKG_VERSION}'`
+  `svn cp svn+ssh://#{svn_user}rubyforge.org/var/svn/pivotalrb/js_test_core/trunk svn+ssh://#{svn_user}rubyforge.org/var/svn/pivotalrb/js_test_core/tags/REL-#{dashed_version} -m 'Version #{PKG_VERSION}'`
 end
