@@ -39,9 +39,7 @@ class JsTestCoreTestDir < JsTestCore::Resources::Dir
   end
 end
 
-JsTestCore::Resources::WebRoot::LOCATIONS.unshift(['specs', lambda do
-  JsTestCore::Resources::Specs::SpecDir.new(JsTestCore::Server.spec_root_path, "/specs")
-end])
+JsTestCore::Resources::WebRoot.dispatch_specs
 
 module Spec::Example::ExampleMethods
   attr_reader :core_path, :spec_root_path, :implementation_root_path, :public_path, :server, :connection

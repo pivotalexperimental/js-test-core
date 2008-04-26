@@ -16,6 +16,14 @@ module JsTestCore
         end]
       ]
 
+      class << self
+        def dispatch_specs
+          LOCATIONS.unshift(['specs', lambda do
+            JsTestCore::Resources::Specs::SpecDir.new(JsTestCore::Server.spec_root_path, "/specs")
+          end])
+        end
+      end
+
       attr_reader :public_path
       def initialize(public_path)
         @public_path = ::File.expand_path(public_path)
