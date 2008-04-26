@@ -14,17 +14,18 @@ module JsTestCore
       def implementation_root_path; instance.implementation_root_path; end
       def public_path; instance.public_path; end
       def core_path; instance.core_path; end
+      def test_dir_class; instance.test_dir_class; end
+      def test_file_class; instance.test_file_class; end
       def connection; instance.connection; end
       def request; instance.request; end
       def response; instance.response; end
       def root_url; instance.root_url; end
     end
 
-    attr_reader :host, :port, :spec_root_path, :implementation_root_path, :core_path, :public_path
+    attr_reader :host, :port, :spec_root_path, :implementation_root_path, :public_path
 
     def initialize(spec_root_path, implementation_root_path, public_path, host=DEFAULT_HOST, port=DEFAULT_PORT)
       dir = ::File.dirname(__FILE__)
-      @core_path = ::File.expand_path("#{dir}/../../core")
       @spec_root_path = ::File.expand_path(spec_root_path)
       @implementation_root_path = ::File.expand_path(implementation_root_path)
       @public_path = ::File.expand_path(public_path)
@@ -66,6 +67,18 @@ module JsTestCore
 
     def root_url
       "http://#{host}:#{port}"
+    end
+
+    def core_path
+      JsTestCore.core_path
+    end
+
+    def test_dir_class
+      JsTestCore.adapter.test_dir_class
+    end
+
+    def test_file_class
+      JsTestCore.adapter.test_file_class
     end
     
     protected

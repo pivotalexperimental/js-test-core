@@ -22,5 +22,9 @@ require "#{dir}/js_test_core/rails_server"
 
 module JsTestCore
   DEFAULT_HOST = "0.0.0.0"
-  DEFAULT_PORT = 8080  
+  DEFAULT_PORT = 8080
+
+  class << self
+    attr_accessor :core_path
+  end
 end

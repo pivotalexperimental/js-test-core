@@ -1,23 +1,32 @@
 module JsTestCore
   module Resources
     class WebRoot
+      LOCATIONS = [
+        ['core', lambda do
+          Resources::Dir.new(JsTestCore::Server.core_path, "/core")
+        end],
+        ['implementations', lambda do
+          Resources::Dir.new(JsTestCore::Server.implementation_root_path, "/implementations")
+        end],
+        ['suites', lambda do
+          Resources::Suite
+        end],
+        ['runners', lambda do
+          Resources::Runners.new
+        end]
+      ]
+
       attr_reader :public_path
       def initialize(public_path)
         @public_path = ::File.expand_path(public_path)
       end
 
       def locate(name)
-        case name
-        when 'specs'
-          Resources::Dir.new(JsTestCore::Server.spec_root_path, "/specs")
-        when 'core'
-          Resources::Dir.new(JsTestCore::Server.core_path, "/core")
-        when 'implementations'
-          Resources::Dir.new(JsTestCore::Server.implementation_root_path, "/implementations")
-        when 'suites'
-          Resources::Suite
-        when 'runners'
-          Resources::Runners.new
+        location, initializer = LOCATIONS.find do |location|
+          location.first == name
+        end
+        if initializer
+          initializer.call
         else
           potential_file_in_public_path = "#{public_path}/#{name}"
           if ::File.directory?(potential_file_in_public_path)

@@ -25,7 +25,7 @@ module JsTestCore
       before do
         @absolute_path = spec_root_path
         @relative_path = "/specs"
-        @dir = Resources::Dir.new(absolute_path, relative_path)
+        @dir = Resources::Specs::SpecDir.new(absolute_path, relative_path)
       end
 
       it "has an absolute path" do
@@ -49,15 +49,8 @@ module JsTestCore
       end
 
       describe "#locate when passed a name without an extension" do
-        it "when the name corresponds to a .js file in the directory, returns a SpecFile for the file" do
-          file_runner = dir.locate("failing_spec")
-          file_runner.should be_an_instance_of(SpecFile)
-          file_runner.file.should == spec_file("/failing_spec.js")
-        end
-
         it "when name corresponds to a subdirectory, returns a DirectoryRunner for the directory" do
           subdir = dir.locate("foo")
-          subdir.should be_an_instance_of(Resources::Dir)
           subdir.should == spec_dir("/foo")
         end
 

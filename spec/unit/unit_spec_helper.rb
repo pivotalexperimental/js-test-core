@@ -33,10 +33,22 @@ class Spec::Example::ExampleGroup
   end
 end
 
+class JsTestCoreTestDir < JsTestCore::Resources::Dir
+  def get(request, response)
+
+  end
+end
+
+JsTestCore::Resources::WebRoot::LOCATIONS.unshift(['specs', lambda do
+  JsTestCore::Resources::Specs::SpecDir.new(JsTestCore::Server.spec_root_path, "/specs")
+end])
+
 module Spec::Example::ExampleMethods
-  attr_reader :spec_root_path, :implementation_root_path, :public_path, :server, :connection
+  attr_reader :core_path, :spec_root_path, :implementation_root_path, :public_path, :server, :connection
   before(:all) do
     dir = File.dirname(__FILE__)
+    @core_path = File.expand_path("#{dir}/../example_core")
+    JsTestCore.core_path = core_path
     @spec_root_path = File.expand_path("#{dir}/../example_specs")
     @implementation_root_path = File.expand_path("#{dir}/../example_public/javascripts")
     @public_path = File.expand_path("#{dir}/../example_public")
@@ -92,10 +104,6 @@ module Spec::Example::ExampleMethods
   end
   alias_method :request, :create_request
 
-  def core_path
-    JsTestCore::Server.core_path
-  end
-
   def spec_file(relative_path)
     absolute_path = spec_root_path + relative_path
     JsTestCore::Resources::File.new(absolute_path, "/specs#{relative_path}")
@@ -103,7 +111,7 @@ module Spec::Example::ExampleMethods
 
   def spec_dir(relative_path="")
     absolute_path = spec_root_path + relative_path
-    JsTestCore::Resources::Dir.new(absolute_path, "/specs#{relative_path}")
+    JsTestCore::Resources::Specs::SpecDir.new(absolute_path, "/specs#{relative_path}")
   end
 
   def contain_spec_file_with_correct_paths(path_relative_to_spec_root)

@@ -13,28 +13,6 @@ module JsTestCore
     end
 
     describe "HTTP GET" do
-      specify "'/specs' returns an HTML test runner including all specs files" do
-        result = get("/specs").body
-        result.should include('<script type="text/javascript" src="/specs/failing_spec.js"></script>')
-        result.should include('<script type="text/javascript" src="/specs/foo/failing_spec.js"></script>')
-        result.should include('<script type="text/javascript" src="/specs/foo/passing_spec.js"></script>')
-      end
-
-      specify "'/specs/failing_spec', returns an HTML test runner including it" do
-        result = get("/specs/failing_spec").body
-        result.should include('<script type="text/javascript" src="/specs/failing_spec.js"></script>')
-      end
-
-      specify "'/specs/foo', returns an HTML test runner including all specs below foo" do
-        result = get("/specs/foo").body
-        result.should include('<script type="text/javascript" src="/specs/foo/failing_spec.js"></script>')
-        result.should include('<script type="text/javascript" src="/specs/foo/passing_spec.js"></script>')
-      end
-
-      specify "'/specs/nonexistent', raises an error" do
-        lambda { get("/specs/nonexistent") }.should raise_error
-      end
-
       specify "'/core/JsTestCore.js', returns the contents of the file" do
         response = get("/core/JsTestCore.js")
         response.body.should == ::File.read("#{Server.core_path}/JsTestCore.js")
@@ -100,8 +78,7 @@ module JsTestCore
 
     describe ".core_path" do
       it "returns the expanded path to the JsTestCore core directory" do
-        dir = ::File.dirname(__FILE__)
-        Server.core_path.should == ::File.expand_path("#{dir}/../../../core")
+        Server.core_path.should == core_path
       end
     end
 
