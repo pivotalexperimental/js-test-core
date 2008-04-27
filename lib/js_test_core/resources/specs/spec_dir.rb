@@ -1,7 +1,13 @@
 module JsTestCore
   module Resources
     module Specs
-      class SpecDir < ::JsTestCore::Resources::Dir
+      class SpecDirSuperclass < ::JsTestCore::Resources::Dir
+        def get(request, response)
+          raise NotImplementedError, "#{self.class}#get needs to be implemented"
+        end
+      end
+
+      class SpecDir < SpecDirSuperclass
         def spec_files
           glob("/**/*_spec.js")
         end
@@ -17,10 +23,6 @@ module JsTestCore
             base_path = "#{relative_path}/#{name}"
             raise "No file or directory found at #{base_path} or spec found at #{base_path}.js."
           end
-        end
-
-        def get(request, response)
-          raise NotImplementedError, "#{self.class}#get needs to be implemented"
         end
 
         protected
