@@ -43,17 +43,6 @@ module JsTestCore
             end.should raise_error
           end
         end
-
-        describe Dir, "#glob" do
-          it "returns an array of matching Files under this directory with the correct relative paths" do
-            globbed_files = dir.glob("/**/*_spec.js")
-
-            globbed_files.size.should == 3
-            globbed_files.should contain_spec_file_with_correct_paths("/failing_spec.js")
-            globbed_files.should contain_spec_file_with_correct_paths("/foo/failing_spec.js")
-            globbed_files.should contain_spec_file_with_correct_paths("/foo/passing_spec.js")
-          end
-        end
       end
     end
   end
