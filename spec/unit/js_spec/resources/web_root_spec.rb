@@ -9,11 +9,6 @@ module JsTestCore
       end
 
       describe "#locate" do
-        it "when passed 'specs', returns a SpecDir representing the specs" do
-          runner = web_root.locate('specs')
-          runner.should == spec_dir
-        end
-
         it "when passed 'core', returns a Dir representing the JsTestCore core directory" do
           runner = web_root.locate('core')
           runner.should == Resources::Dir.new(JsTestCore::Server.core_path, '/core')
@@ -47,6 +42,23 @@ module JsTestCore
         it "when not passed 'core' or 'specs', raises an error" do
           lambda do
             web_root.locate('invalid')
+          end.should raise_error
+        end
+      end
+
+      describe ".dispatch_specs" do
+        it "causes #locate /specs to dispatch to a Spec::SpecDir" do
+          WebRoot.dispatch_specs
+          
+          resource = web_root.locate('specs')
+          resource.should == spec_dir('')
+        end
+      end
+
+      describe "when .dispatch_specs is not called" do
+        it "does not cause #locate to dispatch to /specs" do
+          lambda do
+            web_root.locate('specs')
           end.should raise_error
         end
       end

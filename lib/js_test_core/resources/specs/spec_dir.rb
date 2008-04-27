@@ -20,7 +20,7 @@ module JsTestCore
         end
 
         def get(request, response)
-          raise NotImplementedError, "get"
+          raise NotImplementedError, "#{self.class}#get needs to be implemented"
         end
 
         protected

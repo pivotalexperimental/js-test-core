@@ -39,8 +39,6 @@ class JsTestCoreTestDir < JsTestCore::Resources::Dir
   end
 end
 
-JsTestCore::Resources::WebRoot.dispatch_specs
-
 module Spec::Example::ExampleMethods
   attr_reader :core_path, :spec_root_path, :implementation_root_path, :public_path, :server, :connection
   before(:all) do
@@ -72,6 +70,7 @@ module Spec::Example::ExampleMethods
   end
 
   after(:each) do
+    JsTestCore::Resources::WebRoot.dispatch_strategy = nil
     Thin::Logging.silent = true
     Thin::Logging.debug = false
   end

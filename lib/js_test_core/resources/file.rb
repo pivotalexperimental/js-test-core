@@ -2,12 +2,12 @@ module JsTestCore
   module Resources
     class File
       MIME_TYPES = {
-      '.js' => 'text/javascript',
-      '.css' => 'text/css',
-      '.png' => 'image/png',
-      '.jpg' => 'image/jpeg',
-      '.jpeg' => 'image/jpeg',
-      '.gif' => 'image/gif',
+        '.js' => 'text/javascript',
+        '.css' => 'text/css',
+        '.png' => 'image/png',
+        '.jpg' => 'image/jpeg',
+        '.jpeg' => 'image/jpeg',
+        '.gif' => 'image/gif',
       }
 
       attr_reader :absolute_path, :relative_path

@@ -6,6 +6,7 @@ module JsTestCore
     attr_reader :request, :file
 
     before do
+      WebRoot.dispatch_specs
       stub(EventMachine).send_data
       stub(EventMachine).close_connection
       @file = Resources::File.new(absolute_path, relative_path)

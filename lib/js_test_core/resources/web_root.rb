@@ -17,10 +17,9 @@ module JsTestCore
       ]
 
       class << self
+        attr_accessor :dispatch_strategy
         def dispatch_specs
-          LOCATIONS.unshift(['specs', lambda do
-            JsTestCore::Resources::Specs::SpecDir.new(JsTestCore::Server.spec_root_path, "/specs")
-          end])
+          self.dispatch_strategy = :specs
         end
       end
 
@@ -30,6 +29,10 @@ module JsTestCore
       end
 
       def locate(name)
+        if self.class.dispatch_strategy == :specs && name == 'specs'
+          return JsTestCore::Resources::Specs::SpecDir.new(JsTestCore::Server.spec_root_path, "/specs")
+        end
+
         location, initializer = LOCATIONS.find do |location|
           location.first == name
         end
