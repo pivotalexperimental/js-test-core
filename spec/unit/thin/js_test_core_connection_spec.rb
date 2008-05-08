@@ -16,7 +16,6 @@ module Thin
 
       describe "and the call is successful" do
         describe "and the body is not empty" do
-          attr_reader :somedir_resource
           before do
             mock(app = Object.new).call(is_a(Hash)) do
               [200, {}, 'The Body']
@@ -32,17 +31,46 @@ module Thin
         end
 
         describe "and the body is empty" do
-          attr_reader :somedir_resource
-          before do
-            mock(app = Object.new).call(is_a(Hash)) do
-              [200, {}, []]
+          describe "and the Content-Length header is 0" do
+            before do
+              mock(app = Object.new).call(is_a(Hash)) do
+                [200, {"Content-Length" => '0'}, []]
+              end
+              connection.app = app
             end
-            connection.app = app
+
+            it "sends the response to the socket and closes the connection" do
+              mock(connection).close_connection_after_writing
+              connection.receive_data "GET /specs HTTP/1.1\r\nHost: _\r\n\r\n"
+            end
           end
 
-          it "keeps the connection open" do
-            dont_allow(connection).close_connection_after_writing
-            connection.receive_data "GET /specs HTTP/1.1\r\nHost: _\r\n\r\n"
+          describe "and the Content-Length header is > 0" do
+            before do
+              mock(app = Object.new).call(is_a(Hash)) do
+                [200, {"Content-Length" => '55'}, []]
+              end
+              connection.app = app
+            end
+
+            it "keeps the connection open" do
+              dont_allow(connection).close_connection_after_writing
+              connection.receive_data "GET /specs HTTP/1.1\r\nHost: _\r\n\r\n"
+            end
+          end
+
+          describe "and the Content-Length header is not passed in" do
+            before do
+              mock(app = Object.new).call(is_a(Hash)) do
+                [200, {}, []]
+              end
+              connection.app = app
+            end
+
+            it "keeps the connection open" do
+              dont_allow(connection).close_connection_after_writing
+              connection.receive_data "GET /specs HTTP/1.1\r\nHost: _\r\n\r\n"
+            end
           end
         end
       end
