@@ -12,7 +12,7 @@ module JsTestCore
         else
           Runners::FirefoxRunner.resume(suite.id, request['text'])
         end
-        response.headers['Content-Length'] = 0
+        response.headers['Content-Length'] = "0"
       end
     end
   end

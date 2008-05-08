@@ -36,7 +36,7 @@ module JsTestCore
 
             response.headers["Content-Length"].should be_nil
             suite_finish.post(request, response)
-            response.headers["Content-Length"].should == 0
+            response.headers["Content-Length"].should == "0"
           end
         end
 
@@ -85,7 +85,7 @@ module JsTestCore
 
             response.headers["Content-Length"].should be_nil
             suite_finish.post(request, response)
-            response.headers["Content-Length"].should == 0
+            response.headers["Content-Length"].should == "0"
           end
         end
       end
