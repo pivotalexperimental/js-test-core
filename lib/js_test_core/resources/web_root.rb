@@ -56,6 +56,7 @@ module JsTestCore
       def get(request, response)
         response.status = 301
         response['Location'] = "/#{self.class.dispatch_strategy}"
+        response.headers['Content-Length'] = "0"
       end
     end
   end
