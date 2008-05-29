@@ -79,7 +79,7 @@ module JsTestCore
             web_root.get(request, response)
             response.should be_redirect
             response.headers["Location"].should == "/specs"
-            response.headers["Content-Length"].should == "0"
+            response.body.should == "<script type='text/javascript'>window.location.href='/specs';</script>"
           end
         end
 
