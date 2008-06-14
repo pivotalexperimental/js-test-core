@@ -13,3 +13,5 @@ module JsTestCore
     end
   end
 end
+
+#GET /runners/firefox/id

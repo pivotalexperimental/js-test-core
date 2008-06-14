@@ -31,6 +31,10 @@ class Spec::Example::ExampleGroup
 
     attr_writer :thin_logging
   end
+
+  after do
+    JsTestCore::Resources::Runners::FirefoxRunner.instances.clear
+  end
 end
 
 class JsTestCoreTestDir < JsTestCore::Resources::Dir
