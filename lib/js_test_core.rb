@@ -1,6 +1,9 @@
 require "rubygems"
 gem "thin", ">=0.8.0"
 
+dir = File.dirname(__FILE__)
+$LOAD_PATH.unshift File.expand_path("#{dir}/../vendor/thin-rest")
+
 require "thin"
 require "fileutils"
 require "tmpdir"
@@ -10,7 +13,6 @@ require "net/http"
 require "selenium"
 require "optparse"
 
-dir = File.dirname(__FILE__)
 require "#{dir}/js_test_core/thin"
 require "#{dir}/js_test_core/rack"
 require "#{dir}/js_test_core/resources"

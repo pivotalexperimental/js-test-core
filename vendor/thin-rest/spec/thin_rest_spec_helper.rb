@@ -1,5 +1,5 @@
-dir = File.dirname(__FILE__)
 $LOAD_PATH.unshift(File.expand_path("#{dir}/../lib"))
+dir = File.dirname(__FILE__)
 require "thin_rest"
 require "spec"
 require "guid"

@@ -1,23 +1,31 @@
 module JsTestCore
   module Resources
-    class WebRoot
-      LOCATIONS = [
-        ['', lambda do |web_root|
-          web_root
-        end],
-        ['core', lambda do
-          Resources::Dir.new(JsTestCore::Server.core_path, "/core")
-        end],
-        ['implementations', lambda do
-          Resources::Dir.new(JsTestCore::Server.implementation_root_path, "/implementations")
-        end],
-        ['suites', lambda do
-          Resources::Suite
-        end],
-        ['runners', lambda do
-          Resources::Runners.new
-        end]
-      ]
+    class WebRoot < ThinRest::Resource
+      route "core" do
+        Resources::Dir.new(JsTestCore::Server.core_path, "/core")
+      end
+      route "implementations" do
+        Resources::Dir.new(JsTestCore::Server.implementation_root_path, "/implementations")
+      end
+      route "suites", "JsTestCore::Resources::Suite"
+      route "runners", "JsTestCore::Resources::Runners"
+#      LOCATIONS = [
+#        ['', lambda do |web_root|
+#          web_root
+#        end],
+#        ['core', lambda do
+#          Resources::Dir.new(JsTestCore::Server.core_path, "/core")
+#        end],
+#        ['implementations', lambda do
+#          Resources::Dir.new(JsTestCore::Server.implementation_root_path, "/implementations")
+#        end],
+#        ['suites', lambda do
+#          Resources::Suite
+#        end],
+#        ['runners', lambda do
+#          Resources::Runners.new
+#        end]
+#      ]
 
       class << self
         attr_accessor :dispatch_strategy
