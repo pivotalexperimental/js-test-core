@@ -1,5 +1,5 @@
-$LOAD_PATH.unshift(File.expand_path("#{dir}/../lib"))
 dir = File.dirname(__FILE__)
+$LOAD_PATH.unshift(File.expand_path("#{dir}/../lib"))
 require "thin_rest"
 require "spec"
 require "guid"
@@ -48,13 +48,16 @@ end
 
 class TestConnection < ThinRest::Connection
   def root_resource
-    Root
+    Root.new(:connection => self)
   end
 end
 
 class Root < ThinRest::Resource
   property :connection
   route 'subresource', 'Subresource'
+  route 'block_subresource' do |env, name|
+    BlockSubresource.new(env)
+  end
 end
 
 class Subresource < ThinRest::Resource
@@ -73,4 +76,8 @@ class Subresource < ThinRest::Resource
   def do_delete
     "DELETE response"
   end
+end
+
+class BlockSubresource < ThinRest::Resource
+
 end
