@@ -1,8 +1,8 @@
 --- 
 format: 1
 handler: 
-  commit: 5af866c7f0d79688d7f8bb353f0b61f378cb23ad
+  commit: 82dba28e91cc6c5558604b04d437213238e9ad02
   branch: HEAD
-lock: 
 repository_url: ../thin-rest
+lock: 
 repository_class: Piston::Git::Repository
