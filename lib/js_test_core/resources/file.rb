@@ -1,6 +1,6 @@
 module JsTestCore
   module Resources
-    class File
+    class File < ThinRest::Resource
       MIME_TYPES = {
         '.js' => 'text/javascript',
         '.css' => 'text/css',
@@ -10,14 +10,9 @@ module JsTestCore
         '.gif' => 'image/gif',
       }
 
-      attr_reader :absolute_path, :relative_path
+      property :absolute_path, :relative_path
 
-      def initialize(absolute_path, relative_path)
-        @absolute_path = absolute_path
-        @relative_path = relative_path
-      end
-
-      def get(request, response)
+      def get
         extension = ::File.extname(absolute_path)
         response.headers['Content-Type'] = MIME_TYPES[extension] || 'text/html'
         response.body = ::File.read(absolute_path)

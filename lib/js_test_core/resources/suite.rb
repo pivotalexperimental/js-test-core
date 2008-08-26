@@ -1,6 +1,6 @@
 module JsTestCore
   module Resources
-    class Suite
+    class Suite < ThinRest::Resource
       class << self
         def locate(id)
           new id

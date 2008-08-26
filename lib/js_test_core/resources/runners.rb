@@ -2,7 +2,7 @@ dir = File.dirname(__FILE__)
 
 module JsTestCore
   module Resources
-    class Runners
+    class Runners < ThinRest::Resource
       def locate(name)
         if name == 'firefox'
           FirefoxRunner.new

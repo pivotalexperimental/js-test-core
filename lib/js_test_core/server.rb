@@ -34,27 +34,10 @@ module JsTestCore
     end
 
     def run(options)
-      server = ::Thin::Server.new(options[:Host], options[:Port], self)
+      server = ::Thin::Server.new(options[:Host], options[:Port])
       server.backend = ::Thin::Backends::JsTestCoreServer.new(options[:Host], options[:Port])
       server.backend.server = server
       server.start!
-    end
-
-    def call(env)
-      self.connection = env['js_test_core.connection']
-      self.request = Rack::Request.new(env)
-      self.response = Rack::Response.new
-      method = request.request_method.downcase.to_sym
-      get_resource(request).send(method, request, response)
-      response.finish
-    ensure
-      self.connection = nil
-      self.request = nil
-      self.response = nil
-    end
-
-    def connection
-      Thread.current[:connection]
     end
 
     def request

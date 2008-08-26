@@ -1,31 +1,42 @@
 module JsTestCore
   module Resources
     class WebRoot < ThinRest::Resource
-      route "core" do
-        Resources::Dir.new(JsTestCore::Server.core_path, "/core")
+      route "core" do |env, name|
+        Resources::Dir.new(env.merge(
+          :absolute_path => JsTestCore::Server.core_path,
+          :relative_path => "/core"
+        ))
       end
-      route "implementations" do
-        Resources::Dir.new(JsTestCore::Server.implementation_root_path, "/implementations")
+      route "implementations" do |env, name|
+        Resources::Dir.new(env.merge(
+          :absolute_path => JsTestCore::Server.implementation_root_path,
+          :relative_path => "/implementations"
+        ))
       end
       route "suites", "JsTestCore::Resources::Suite"
       route "runners", "JsTestCore::Resources::Runners"
-#      LOCATIONS = [
-#        ['', lambda do |web_root|
-#          web_root
-#        end],
-#        ['core', lambda do
-#          Resources::Dir.new(JsTestCore::Server.core_path, "/core")
-#        end],
-#        ['implementations', lambda do
-#          Resources::Dir.new(JsTestCore::Server.implementation_root_path, "/implementations")
-#        end],
-#        ['suites', lambda do
-#          Resources::Suite
-#        end],
-#        ['runners', lambda do
-#          Resources::Runners.new
-#        end]
-#      ]
+      route "specs" do
+        Resources::Dir.new(env.merge(
+          :absolute_path => JsTestCore::Server.spec_root_path,
+          :relative_path => "/specs"
+        ))
+      end
+      route ANY do |env, name|
+        potential_file_in_public_path = "#{public_path}/#{name}"
+        if ::File.directory?(potential_file_in_public_path)
+          Resources::Dir.new(env.merge(
+            :absolute_path => potential_file_in_public_path,
+            :relative_path => "/#{name}"
+          ))
+        elsif ::File.exists?(potential_file_in_public_path)
+          Resources::File.new(env.merge(
+            :absolute_path => potential_file_in_public_path,
+            :relative_path => "/#{name}"
+          ))
+        else
+          Resources::FileNotFound.new(env.merge(:name => name))
+        end
+      end
 
       class << self
         attr_accessor :dispatch_strategy
@@ -34,34 +45,9 @@ module JsTestCore
         end
       end
 
-      attr_reader :public_path
-      def initialize(public_path)
-        @public_path = ::File.expand_path(public_path)
-      end
+      property :public_path
 
-      def locate(name)
-        if self.class.dispatch_strategy == :specs && name == 'specs'
-          return JsTestCore::Resources::Specs::SpecDir.new(JsTestCore::Server.spec_root_path, "/specs")
-        end
-
-        location, initializer = LOCATIONS.find do |location|
-          location.first == name
-        end
-        if initializer
-          initializer.call(self)
-        else
-          potential_file_in_public_path = "#{public_path}/#{name}"
-          if ::File.directory?(potential_file_in_public_path)
-            Resources::Dir.new(potential_file_in_public_path, "/#{name}")
-          elsif ::File.exists?(potential_file_in_public_path)
-            Resources::File.new(potential_file_in_public_path, "/#{name}")
-          else
-            Resources::FileNotFound.new(name)
-          end
-        end
-      end
-
-      def get(request, response)
+      def get
         response.status = 301
         response['Location'] = "/#{self.class.dispatch_strategy}"
         response.body = "<script type='text/javascript'>window.location.href='/specs';</script>"

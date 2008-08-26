@@ -30,7 +30,7 @@ module JsTestCore
           @connection = Server.connection
         end
 
-        def post(request, response)
+        def post
           @response = response
 
           spec_url = (request && request['spec_url']) ? request['spec_url'] : spec_suite_url

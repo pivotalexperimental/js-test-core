@@ -60,7 +60,7 @@ module JsTestCore
           it "can be overridden from a Module without needing to redefine the #get method" do
             spec_dir_class = Resources::Specs::SpecDir.clone
             mod = Module.new do
-              def get(request, response)
+              def get
               end
             end
             spec_dir_class.class_eval do

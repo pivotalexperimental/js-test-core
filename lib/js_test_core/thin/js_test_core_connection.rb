@@ -2,7 +2,7 @@ module Thin
   class JsTestCoreConnection < ThinRest::Connection
     protected
     def root_resource
-      WebRoot
+      ::JsTestCore::Resources::WebRoot.new(:connection => self, :public_path => ::JsTestCore::Server.public_path)
     end
   end
 end

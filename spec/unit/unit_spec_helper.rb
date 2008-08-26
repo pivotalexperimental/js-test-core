@@ -34,7 +34,7 @@ class Spec::Example::ExampleGroup
 end
 
 class JsTestCoreTestDir < JsTestCore::Resources::Dir
-  def get(request, response)
+  def get
 
   end
 end
@@ -95,9 +95,12 @@ module Spec::Example::ExampleMethods
     Rack::MockRequest.env_for(url, params.merge({:method => method.to_s.upcase, 'js_test_core.connection' => connection}))
   end
 
-  def create_request(method, url, params={})
-    env = env_for(method, url, params)
-    server.call(env)[2]
+  def create_request(method, path, params={})
+    body = params.map do |key, value|
+      "#{URI.escape(key)}=#{URI.escape(value)}"
+    end.join("&")
+    connection.receive_data "#{method.to_s.upcase} #{path} HTTP/1.1\r\nHost: _\r\nContent-Length: #{body.length}\r\n\r\n#{body}"
+    connection.response
   end
   alias_method :request, :create_request
 

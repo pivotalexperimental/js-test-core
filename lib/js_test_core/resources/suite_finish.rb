@@ -1,12 +1,12 @@
 module JsTestCore
   module Resources
-    class SuiteFinish
+    class SuiteFinish < ThinRest::Resource
       attr_reader :suite
       def initialize(suite)
         @suite = suite
       end
 
-      def post(request, response)
+      def post
         if suite.id == 'user'
           STDOUT.puts request['text']
         else

@@ -2,7 +2,7 @@ module JsTestCore
   module Resources
     module Specs
       class SpecDirSuperclass < ::JsTestCore::Resources::Dir
-        def get(request, response)
+        def get
           raise NotImplementedError, "#{self.class}#get needs to be implemented"
         end
       end

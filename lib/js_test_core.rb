@@ -2,9 +2,9 @@ require "rubygems"
 gem "thin", ">=0.8.0"
 
 dir = File.dirname(__FILE__)
-$LOAD_PATH.unshift File.expand_path("#{dir}/../vendor/thin-rest")
+$LOAD_PATH.unshift File.expand_path("#{dir}/../vendor/thin-rest/lib")
+require "thin_rest"
 
-require "thin"
 require "fileutils"
 require "tmpdir"
 require "timeout"
