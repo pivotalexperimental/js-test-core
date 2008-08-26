@@ -15,7 +15,7 @@ module JsTestCore
       end
       route "suites", "JsTestCore::Resources::Suite"
       route "runners", "JsTestCore::Resources::Runners"
-      route "specs" do
+      route "specs" do |env, name|
         Resources::Dir.new(env.merge(
           :absolute_path => JsTestCore::Server.spec_root_path,
           :relative_path => "/specs"
