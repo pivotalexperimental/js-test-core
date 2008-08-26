@@ -7,11 +7,8 @@ module JsTestCore
         end
       end
 
-      attr_reader :id
-      def initialize(id)
-        @id = id
-      end
-
+      property :id
+      
       def locate(name)
         if name == 'finish'
           SuiteFinish.new self

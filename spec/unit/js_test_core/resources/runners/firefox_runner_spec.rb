@@ -6,7 +6,6 @@ module JsTestCore
       attr_reader :runner, :request, :response, :driver, :suite_id
       
       before do
-        Thread.current[:connection] = connection
         @driver = "Selenium Driver"
         @suite_id = 12345
         stub(Selenium::SeleniumDriver).new('localhost', 4444, '*firefox', 'http://0.0.0.0:8080') do
@@ -19,7 +18,7 @@ module JsTestCore
           before do
             @request = Rack::Request.new( Rack::MockRequest.env_for('/runners/firefox') )
             @response = Rack::Response.new
-            @runner = Runners::FirefoxRunner.new
+            @runner = Runners::FirefoxRunner.new(:connection => connection)
             stub(Thread).start.yields
             
             stub(driver).start
@@ -29,7 +28,7 @@ module JsTestCore
             stub(EventMachine).send_data
             stub(EventMachine).close_connection
 
-            runner.post(request, response)
+            runner.post
             runner.suite_id.should == suite_id
           end
 
@@ -55,7 +54,7 @@ module JsTestCore
         before do
           @request = Rack::Request.new( Rack::MockRequest.env_for('/runners/firefox') )
           @response = Rack::Response.new
-          @runner = Runners::FirefoxRunner.new
+          @runner = Runners::FirefoxRunner.new(:connection => connection)
           stub(Thread).start.yields
         end
 
@@ -65,7 +64,7 @@ module JsTestCore
           stub(driver).session_id {suite_id}
           dont_allow(EventMachine).send_data
           dont_allow(EventMachine).close_connection
-          runner.post(request, response)
+          runner.post
 
           response.body.should be_empty
         end
@@ -82,7 +81,7 @@ module JsTestCore
             mock(Selenium::SeleniumDriver).new('another-machine', 4444, '*firefox', 'http://0.0.0.0:8080') do
               driver
             end
-            runner.post(request, response)
+            runner.post
           end
         end
 
@@ -98,7 +97,7 @@ module JsTestCore
             mock(Selenium::SeleniumDriver).new('localhost', 4444, '*firefox', 'http://0.0.0.0:8080') do
               driver
             end
-            runner.post(request, response)
+            runner.post
           end
         end
 
@@ -114,7 +113,7 @@ module JsTestCore
             mock(Selenium::SeleniumDriver).new('localhost', 4000, '*firefox', 'http://0.0.0.0:8080') do
               driver
             end
-            runner.post(request, response)
+            runner.post
           end
         end
 
@@ -130,7 +129,7 @@ module JsTestCore
             mock(Selenium::SeleniumDriver).new('localhost', 4444, '*firefox', 'http://0.0.0.0:8080') do
               driver
             end
-            runner.post(request, response)
+            runner.post
           end
         end
 
@@ -147,7 +146,7 @@ module JsTestCore
             mock(driver).open("http://another-host:8080/specs/subdir")
             mock(driver).session_id {suite_id}
 
-            runner.post(request, response)
+            runner.post
           end
         end
 
@@ -164,7 +163,7 @@ module JsTestCore
             mock(driver).open("http://0.0.0.0:8080/specs")
             mock(driver).session_id {suite_id}
 
-            runner.post(request, response)
+            runner.post
           end
         end
       end
@@ -173,11 +172,11 @@ module JsTestCore
         before do
           @request = Rack::Request.new( Rack::MockRequest.env_for('/runners/firefox') )
           @response = Rack::Response.new
-          @runner = Runners::FirefoxRunner.new
+          @runner = Runners::FirefoxRunner.new(:connection => connection)
           stub(driver).start
           stub(driver).open
           stub(driver).session_id {suite_id}
-          runner.post(request, response)
+          runner.post
         end
 
         it "kills the browser, sends the response body, and close the connection" do

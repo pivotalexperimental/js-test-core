@@ -1,7 +1,7 @@
 module JsTestCore
   module Resources
     class Runners
-      class FirefoxRunner
+      class FirefoxRunner < ThinRest::Resource
         class << self
           def resume(suite_id, text)
             if instances[suite_id]
@@ -21,23 +21,20 @@ module JsTestCore
         end
 
         include FileUtils
-        attr_reader :profile_dir, :connection, :driver, :response
+        attr_reader :profile_dir, :driver
 
-        def initialize
+        def after_initialize
           profile_base = "#{::Dir.tmpdir}/js_test_core/firefox"
           mkdir_p profile_base
           @profile_dir = "#{profile_base}/#{Time.now.to_i}"
-          @connection = Server.connection
         end
 
         def post
-          @response = response
-
-          spec_url = (request && request['spec_url']) ? request['spec_url'] : spec_suite_url
+          spec_url = (rack_request && rack_request['spec_url']) ? rack_request['spec_url'] : spec_suite_url
           parsed_spec_url = URI.parse(spec_url)
-          selenium_port = (request['selenium_port'] || 4444).to_i
+          selenium_port = (rack_request['selenium_port'] || 4444).to_i
           @driver = Selenium::SeleniumDriver.new(
-            request['selenium_host'] || 'localhost',
+            rack_request['selenium_host'] || 'localhost',
             selenium_port,
             '*firefox',
             "#{parsed_spec_url.scheme}://#{parsed_spec_url.host}:#{parsed_spec_url.port}"
@@ -56,8 +53,7 @@ module JsTestCore
 
         def finalize(text)
           driver.stop
-          response.body = text
-          connection.send_body(response)
+          connection.send_body(text)
         end
 
         def suite_id

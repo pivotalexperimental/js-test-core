@@ -122,7 +122,14 @@ module Spec::Example::ExampleMethods
       file = globbed_files.find do |file|
         file.absolute_path == expected_absolute_path
       end
-      file && file.relative_path == expected_relative_path
+      raise "Did not find file with absolute path of #{expected_absolute_path.inspect}" unless file
+      file.relative_path == expected_relative_path
+    end
+  end
+
+  def stub_send_data
+    stub(EventMachine).send_data do |signature, data, data_length|
+      data_length
     end
   end
 end

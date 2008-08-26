@@ -1,16 +1,13 @@
 module JsTestCore
   module Resources
     class SuiteFinish < ThinRest::Resource
-      attr_reader :suite
-      def initialize(suite)
-        @suite = suite
-      end
-
+      property :suite
+      
       def post
         if suite.id == 'user'
-          STDOUT.puts request['text']
+          STDOUT.puts rack_request['text']
         else
-          Runners::FirefoxRunner.resume(suite.id, request['text'])
+          Runners::FirefoxRunner.resume(suite.id, rack_request['text'])
         end
         response.headers['Content-Length'] = "0"
       end

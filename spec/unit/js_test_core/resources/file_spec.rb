@@ -3,14 +3,17 @@ require File.expand_path("#{File.dirname(__FILE__)}/../../unit_spec_helper")
 module JsTestCore
   module Resources
     describe File do
-      attr_reader :request, :file
+      attr_reader :file
 
       before do
         WebRoot.dispatch_specs
         stub(EventMachine).send_data
         stub(EventMachine).close_connection
-        @file = Resources::File.new(absolute_path, relative_path)
-        @request = create_request('get', relative_path)
+        @file = Resources::File.new(
+          :connection => connection,
+          :absolute_path => absolute_path,
+          :relative_path => relative_path
+        )
       end
 
       def absolute_path
@@ -36,26 +39,26 @@ module JsTestCore
       describe "#get" do
         attr_reader :response
         before do
-          @response = Rack::Response.new
+          @response = connection.response
         end
 
         it "returns the contents of the file" do
-          file.get(request, response)
+          file.get
           response.body.should == ::File.read(absolute_path)
         end
 
         describe "when File has an extension" do
           describe '.js' do
             it "sets Content-Type to text/javascript" do
-              file.get(request,response)
-              response.content_type.should == "text/javascript"
+              file.get
+              response.headers.to_s.should include("Content-Type: text/javascript\r\n")
             end
           end
 
           describe '.css' do
             it "sets Content-Type to text/css" do
-              file.get(request, response)
-              response.content_type.should == "text/css"
+              file.get
+              response.headers.to_s.should include("Content-Type: text/css\r\n")
             end
 
             def absolute_path
@@ -71,16 +74,16 @@ module JsTestCore
 
       describe "==" do
         it "returns true when passed a file with the same absolute and relative paths" do
-          file.should == Resources::File.new(absolute_path, relative_path)
+          file.should == Resources::File.new(:absolute_path => absolute_path, :relative_path => relative_path)
         end
 
         it "returns false when passed a file with a different absolute or relative path" do
-          file.should_not == Resources::File.new(absolute_path, "bogus")
-          file.should_not == Resources::File.new("bogus", relative_path)
+          file.should_not == Resources::File.new(:absolute_path => absolute_path, :relative_path => "bogus")
+          file.should_not == Resources::File.new(:absolute_path => "bogus", :relative_path => relative_path)
         end
 
         it "when passed a Dir, returns false because File is not a Dir" do
-          file.should_not == Resources::Dir.new(absolute_path, relative_path)
+          file.should_not == Resources::Dir.new(:absolute_path => absolute_path, :relative_path => relative_path)
         end
       end
     end

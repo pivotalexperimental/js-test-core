@@ -16,7 +16,6 @@ module JsTestCore
       def core_path; instance.core_path; end
       def test_dir_class; instance.test_dir_class; end
       def test_file_class; instance.test_file_class; end
-      def connection; instance.connection; end
       def request; instance.request; end
       def response; instance.response; end
       def root_url; instance.root_url; end
@@ -40,14 +39,6 @@ module JsTestCore
       server.start!
     end
 
-    def request
-      Thread.current[:request]
-    end
-
-    def response
-      Thread.current[:response]
-    end
-
     def root_url
       "http://#{host}:#{port}"
     end
@@ -65,18 +56,6 @@ module JsTestCore
     end
     
     protected
-    def connection=(connection)
-      Thread.current[:connection] = connection
-    end
-
-    def request=(request)
-      Thread.current[:request] = request
-    end
-
-    def response=(response)
-      Thread.current[:response] = response
-    end
-
     def path_parts(req)
       request.path_info.split('/').reject { |part| part == "" }
     end
