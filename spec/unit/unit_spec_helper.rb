@@ -61,7 +61,7 @@ module Spec::Example::ExampleMethods
     stub(EventMachine).send_data do
       raise "Calls to EventMachine.send_data must be mocked or stubbed"
     end
-    @connection = Thin::JsTestCoreConnection.new(Guid.new)
+    @connection = create_connection
     stub(EventMachine).send_data {raise "EventMachine.send_data must be handled"}
     stub(EventMachine).close_connection {raise "EventMachine.close_connection must be handled"}
     @server = JsTestCore::Server.instance
@@ -73,6 +73,10 @@ module Spec::Example::ExampleMethods
     JsTestCore::Resources::WebRoot.dispatch_strategy = nil
     Thin::Logging.silent = true
     Thin::Logging.debug = false
+  end
+
+  def create_connection(guid=Guid.new)
+    Thin::JsTestCoreConnection.new(Guid.new)
   end
 
   def get(url, params={})

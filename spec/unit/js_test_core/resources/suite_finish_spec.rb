@@ -38,7 +38,7 @@ module JsTestCore
         context "when :suite_id != 'user'" do
           attr_reader :suite_id, :driver
           before do
-            @suite_id = '12345'
+            @suite_id = 12345
             @driver = "Selenium Driver"
             stub(Selenium::SeleniumDriver).new('localhost', 4444, '*firefox', 'http://0.0.0.0:8080') do
               driver
@@ -49,6 +49,8 @@ module JsTestCore
             stub(Thread).start.yields
 
             firefox_connection = Thin::JsTestCoreConnection.new(Guid.new)
+            stub(firefox_connection).send_head
+            stub(firefox_connection).send_body
             stub(firefox_connection).close_connection
             firefox_connection.receive_data("POST /runners/firefox HTTP/1.1\r\nHost: _\r\n\r\n")
           end
@@ -56,9 +58,10 @@ module JsTestCore
           it "resumes the FirefoxRunner" do
             text = "The text in the POST body"
             body = "text=#{text}"
-            mock.proxy(Runners::FirefoxRunner).resume(suite_id, text)
+            stub(connection).send_head
+            stub(connection).send_body
+            mock.proxy(Runners::FirefoxRunner).finalize(suite_id.to_s, text)
             mock(driver).stop
-            stub_send_data
             stub(connection).close_connection
 
             connection.receive_data("POST /suites/#{suite_id}/finish HTTP/1.1\r\nHost: _\r\nContent-Length: #{body.length}\r\n\r\n#{body}")

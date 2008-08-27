@@ -40,10 +40,6 @@ module JsTestCore
       end
     end
 
-    RUNNING = 'running'
-    SUCCESSFUL_COMPLETION = 'success'
-    FAILURE_COMPLETION = 'failure'
-
     attr_reader :parameters, :http, :suite_start_response, :last_poll_result, :last_poll
     def initialize(parameters)
       @parameters = parameters
@@ -76,10 +72,10 @@ module JsTestCore
 
     def report_result
       case last_poll_result
-      when SUCCESSFUL_COMPLETION
+      when Resources::Suite::SUCCESSFUL_COMPLETION
         STDOUT.puts "SUCCESS"
         true
-      when FAILURE_COMPLETION
+      when Resources::Suite::FAILURE_COMPLETION
         STDOUT.puts "FAILURE"
         false
       else
@@ -88,7 +84,7 @@ module JsTestCore
     end
 
     def suite_not_completed?
-      last_poll_result.nil? || last_poll_result == RUNNING
+      last_poll_result.nil? || last_poll_result == Resources::Suite::RUNNING
     end
 
     def poll

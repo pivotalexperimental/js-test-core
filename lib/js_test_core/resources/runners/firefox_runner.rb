@@ -3,14 +3,17 @@ module JsTestCore
     class Runners
       class FirefoxRunner < ThinRest::Resource
         class << self
-          def resume(suite_id, text)
-            if instances[suite_id]
-              runner = instances.delete(suite_id)
+          def find(id)
+            instances[Integer(id)]
+          end
+
+          def finalize(suite_id, text)
+            if runner = find(suite_id)
               runner.finalize(text)
             end
           end
 
-          def register_instance(runner)
+          def register(runner)
             instances[runner.suite_id] = runner
           end
 
@@ -21,7 +24,7 @@ module JsTestCore
         end
 
         include FileUtils
-        attr_reader :profile_dir, :driver
+        attr_reader :profile_dir, :driver, :suite_run_result
 
         def after_initialize
           profile_base = "#{::Dir.tmpdir}/js_test_core/firefox"
@@ -48,13 +51,26 @@ module JsTestCore
           Thread.start do
             driver.open(spec_url)
           end
-          response.status = 200
-          FirefoxRunner.register_instance self
+          connection.send_head
+          connection.send_body("")
+          FirefoxRunner.register self
         end
 
-        def finalize(text)
+        def finalize(suite_run_result)
           driver.stop
-          connection.send_body(text)
+          @suite_run_result = suite_run_result
+        end
+
+        def running?
+          suite_run_result.nil?
+        end
+
+        def successful?
+          !running? && suite_run_result.empty?
+        end
+
+        def failed?
+          !running? && !successful?
         end
 
         def suite_id

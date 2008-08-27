@@ -7,7 +7,7 @@ module JsTestCore
         if suite.id == 'user'
           STDOUT.puts rack_request['text']
         else
-          Runners::FirefoxRunner.resume(suite.id, rack_request['text'])
+          Runners::FirefoxRunner.finalize(suite.id, rack_request['text'])
         end
         connection.send_head
         connection.send_body("")
