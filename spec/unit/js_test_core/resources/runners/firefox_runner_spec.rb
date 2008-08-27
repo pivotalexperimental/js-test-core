@@ -7,7 +7,7 @@ module JsTestCore
 
       before do
         @driver = "Selenium Driver"
-        @suite_id = 12345
+        @suite_id = "DEADBEEF"
         stub(Selenium::SeleniumDriver).new('localhost', 4444, '*firefox', 'http://0.0.0.0:8080') do
           driver
         end
@@ -22,15 +22,9 @@ module JsTestCore
           Runners::FirefoxRunner.register(runner)
         end
         
-        context "when passed an Integer that corresponds to a Runner that exists" do
+        context "when passed an id for which there is a corresponding Runner" do
           it "returns the Runner" do
             Runners::FirefoxRunner.find(suite_id).should == runner
-          end
-        end
-
-        context "when passed a String representation of an Integer that corresponds to a Runner that exists" do
-          it "returns the Runner" do
-            Runners::FirefoxRunner.find(suite_id.to_s).should == runner
           end
         end
 

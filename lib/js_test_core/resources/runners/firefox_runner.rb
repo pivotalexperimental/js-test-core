@@ -4,7 +4,7 @@ module JsTestCore
       class FirefoxRunner < ThinRest::Resource
         class << self
           def find(id)
-            instances[Integer(id)]
+            instances[id.to_s]
           end
 
           def finalize(suite_id, text)
