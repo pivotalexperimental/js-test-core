@@ -12,7 +12,11 @@ module JsTestCore
       end
 
       def get
-
+        connection.send_head
+        connection.send_body(::Dir.glob("#{absolute_path}/*").inject("") do |html, file|
+          file_basename = ::File.basename(file)
+          html << %Q|<a href="#{file_basename}">#{file_basename}</a>\n|
+        end)
       end
 
       def glob(pattern)

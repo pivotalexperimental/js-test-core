@@ -73,6 +73,18 @@ module JsTestCore
             end.should_not raise_error
           end
         end
+
+        describe "GET /" do
+          context "when WebRoot.dispatch_specs has been invoked" do
+            it "redirects to /specs" do
+              WebRoot.dispatch_specs
+              mock(connection).send_head(301, :Location => '/specs')
+              mock(connection).send_body("<script type='text/javascript'>window.location.href='/specs';</script>")
+
+              connection.receive_data("GET / HTTP/1.1\r\nHost: _\r\n\r\n")
+            end
+          end
+        end
       end
     end
   end

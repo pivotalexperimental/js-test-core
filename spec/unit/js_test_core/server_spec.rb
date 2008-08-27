@@ -12,30 +12,6 @@ module JsTestCore
       stub(EventMachine).close_connection
     end
 
-    describe "HTTP GET" do
-      context "/core/JsTestCore.js" do
-        it "returns the contents of the file" do
-          response = get("/core/JsTestCore.js")
-          response.body.should == ::File.read("#{Server.core_path}/JsTestCore.js")
-        end
-      end
-
-      context "/stylesheets/example.css" do
-        it "returns the contents of the file" do
-          response = get("/stylesheets/example.css")
-          response.body.should == ::File.read("#{Server.public_path}/stylesheets/example.css")
-        end
-      end
-
-      context "/invalid/path" do
-        self.thin_logging = false
-        it "shows the full invalid path in the error message" do
-          mock.proxy(connection).log_error(is_a(ThinRest::RoutingError))
-          get("/invalid/path")
-        end
-      end
-    end
-
     describe ".run" do
       attr_reader :server_instance
       before do

@@ -2,7 +2,7 @@ require "rubygems"
 require "spec"
 
 dir = File.dirname(__FILE__)
-$LOAD_PATH.unshift "#{dir}/../../lib"
+$LOAD_PATH.unshift File.expand_path("#{dir}/../../lib")
 require "js_test_core"
 require "hpricot"
 require "guid"

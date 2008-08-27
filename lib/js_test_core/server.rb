@@ -14,8 +14,6 @@ module JsTestCore
       def implementation_root_path; instance.implementation_root_path; end
       def public_path; instance.public_path; end
       def core_path; instance.core_path; end
-      def test_dir_class; instance.test_dir_class; end
-      def test_file_class; instance.test_file_class; end
       def request; instance.request; end
       def response; instance.response; end
       def root_url; instance.root_url; end
@@ -45,14 +43,6 @@ module JsTestCore
 
     def core_path
       JsTestCore.core_path
-    end
-
-    def test_dir_class
-      JsTestCore.adapter.test_dir_class
-    end
-
-    def test_file_class
-      JsTestCore.adapter.test_file_class
     end
   end
 end
