@@ -11,36 +11,38 @@ module JsTestCore
           @dir = Resources::Specs::SpecDir.new(:connection => connection, :absolute_path => absolute_path, :relative_path => relative_path)
         end
 
-        it "has an absolute path" do
-          dir.absolute_path.should == absolute_path
-        end
+        describe "#locate" do
+          context "when passed the name with an extension" do
+            context "when file exists" do
+              it "returns a Resources::File representing it" do
+                file = dir.locate("failing_spec.js")
+                file.relative_path.should == "/specs/failing_spec.js"
+                file.absolute_path.should == "#{spec_root_path}/failing_spec.js"
+              end
+            end
 
-        it "has a relative path" do
-          dir.relative_path.should == relative_path
-        end
-
-        describe "#locate when passed the name with an extension" do
-          it "when file exists, returns a Resources::File representing it" do
-            file = dir.locate("failing_spec.js")
-            file.relative_path.should == "/specs/failing_spec.js"
-            file.absolute_path.should == "#{spec_root_path}/failing_spec.js"
+            context "when file does not exist" do
+              it "raises error" do
+                lambda { dir.locate("nonexistent.js") }.should raise_error
+              end
+            end
           end
 
-          it "when file does not exist, raises error" do
-            lambda { dir.locate("nonexistent.js") }.should raise_error
-          end
-        end
+          context "when passed a name without an extension" do
+            context "when name corresponds to a subdirectory" do
+              it "returns a DirectoryRunner for the directory" do
+                subdir = dir.locate("foo")
+                subdir.should == spec_dir("/foo")
+              end
+            end
 
-        describe "#locate when passed a name without an extension" do
-          it "when name corresponds to a subdirectory, returns a DirectoryRunner for the directory" do
-            subdir = dir.locate("foo")
-            subdir.should == spec_dir("/foo")
-          end
-
-          it "when name does not correspond to a .js file or directory, raises an error" do
-            lambda do
-              dir.locate("nonexistent")
-            end.should raise_error
+            context "when name does not correspond to a .js file or directory" do
+              it "raises an error" do
+                lambda do
+                  dir.locate("nonexistent")
+                end.should raise_error
+              end
+            end
           end
         end
 
