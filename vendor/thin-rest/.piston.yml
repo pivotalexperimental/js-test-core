@@ -1,7 +1,7 @@
 --- 
 format: 1
 handler: 
-  commit: 7c7365a7276ce38db300713bd1e96258b411a1bb
+  commit: a7b38049d5e46ae8b0d41269c220fe3d9af46057
   branch: HEAD
 lock: false
 repository_url: ../thin-rest
