@@ -5,6 +5,9 @@ module JsTestCore
 
     class InvalidStatusResponse < ClientException
     end
+
+    class SuiteNotFound < ClientException
+    end
     
     class << self
       def run(parameters={})
@@ -41,7 +44,7 @@ module JsTestCore
     SUCCESSFUL_COMPLETION = 'success'
     FAILURE_COMPLETION = 'failure'
 
-    attr_reader :parameters, :http, :suite_start_response, :last_poll_result
+    attr_reader :parameters, :http, :suite_start_response, :last_poll_result, :last_poll
     def initialize(parameters)
       @parameters = parameters
     end
@@ -89,7 +92,15 @@ module JsTestCore
     end
 
     def poll
-      @last_poll_result = parts_from_query(http.get("/suites/#{suite_id}").body)['status']
+      @last_poll = http.get("/suites/#{suite_id}")
+      ensure_suite_exists!
+      @last_poll_result = parts_from_query(last_poll.body)['status']
+    end
+
+    def ensure_suite_exists!
+      if (400..499).include?(Integer(last_poll.code))
+        raise SuiteNotFound, "Could not find suite with id #{suite_id}"
+      end
     end
 
     def suite_id

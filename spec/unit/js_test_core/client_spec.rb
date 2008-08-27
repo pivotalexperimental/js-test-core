@@ -57,6 +57,17 @@ module JsTestCore
         it "reports the reason for failure"
       end
 
+      context "when the Suite is not found" do
+        it "raises a SuiteNotFound error" do
+          mock_post_to_firefox_runner
+          mock(request).get("/suites/my_suite_id") do
+            stub(suite_response = Object.new).code {"404"}
+            suite_response
+          end
+          lambda {Client.run}.should raise_error(Client::SuiteNotFound)
+        end
+      end
+
       context "when the Suite run ends in with invalid status" do
         it "raises an InvalidStatusResponse" do
           mock_post_to_firefox_runner
@@ -75,6 +86,7 @@ module JsTestCore
       def mock_polling_returns(suite_statuses=[])
         mock(request).get("/suites/my_suite_id") do
           stub(suite_response = Object.new).body {suite_statuses.shift}
+          stub(suite_response).code {"200"}
           suite_response
         end.times(suite_statuses.length)
       end
