@@ -52,7 +52,7 @@ module JsTestCore
             driver.open(spec_url)
           end
           connection.send_head
-          connection.send_body("")
+          connection.send_body("suite_id=#{suite_id}")
           FirefoxRunner.register self
         end
 
