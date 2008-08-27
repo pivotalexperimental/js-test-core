@@ -14,12 +14,14 @@ module ThinRest
       @rack_request ||= Rack::Request.new(@request.env)
     end
 
-    def send_head(status=200)
-      send_data(head(status))
+    def send_head(status=200, additional_parameters={})
+      send_data(head(status, additional_parameters))
     end
 
-    def head(status)
-      "HTTP/1.1 #{status} OK\r\nConnection: close\r\nServer: Thin Rest Server\r\n"
+    def head(status, additional_parameters)
+      additional_parameters.inject("HTTP/1.1 #{status} OK\r\nConnection: close\r\nServer: Thin Rest Server\r\n") do |header, parameters|
+        header << "#{parameters[0]}: #{parameters[1]}\r\n"
+      end
     end
 
     def send_body(data)
@@ -47,12 +49,8 @@ module ThinRest
     protected
     def guard_against_errors
       yield
-    rescue RoutingError => e
-      handle_error e
     rescue Exception => e
-      wrapped_error = Exception.new("Error in #{rack_request.path_info} : #{e.message}")
-      wrapped_error.set_backtrace(e.backtrace)
-      handle_error wrapped_error
+      handle_error e
     end
     
     def get_resource
