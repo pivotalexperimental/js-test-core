@@ -2,8 +2,8 @@ module JsTestCore
   module Resources
     class Suite < ThinRest::Resource
       class Collection < ThinRest::Resource
-        route ANY do |env, name|
-          Suite.new(env.merge(:name => name))
+        route ANY do |env, id|
+          Suite.new(env.merge(:id => id))
         end
       end
 

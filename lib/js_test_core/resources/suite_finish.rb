@@ -9,7 +9,8 @@ module JsTestCore
         else
           Runners::FirefoxRunner.resume(suite.id, rack_request['text'])
         end
-        response.headers['Content-Length'] = "0"
+        connection.send_head
+        connection.send_body("")
       end
     end
   end
