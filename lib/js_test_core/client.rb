@@ -8,7 +8,7 @@ module JsTestCore
 
     class SuiteNotFound < ClientException
     end
-    
+
     class << self
       def run(parameters={})
         new(parameters).run
@@ -40,9 +40,10 @@ module JsTestCore
       end
     end
 
-    attr_reader :parameters, :http, :suite_start_response, :last_poll_result, :last_poll
+    attr_reader :parameters, :query_string, :http, :suite_start_response, :last_poll_result, :last_poll
     def initialize(parameters)
       @parameters = parameters
+      @query_string = SeleniumServerConfiguration.query_string_from(parameters)
     end
 
     def run
@@ -63,7 +64,7 @@ module JsTestCore
     
     protected
     def start_firefox_runner
-      @suite_start_response = http.post('/runners/firefox', SeleniumServerConfiguration.query_string_from(parameters))
+      @suite_start_response = http.post('/runners/firefox', query_string)
     end
 
     def wait_for_suite_to_finish

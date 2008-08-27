@@ -8,7 +8,7 @@ module JsTestCore
       end
     end
 
-    def initialize(parameters)
+    def initialize(parameters={})
       @parameters = parameters
     end
 

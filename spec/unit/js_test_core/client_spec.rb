@@ -103,50 +103,37 @@ module JsTestCore
         "status=#{Resources::Suite::FAILURE_COMPLETION}&reason=#{reason}"
       end
     end
-#    
-#    describe ".run_argv" do
-#      attr_reader :request, :response
-#      before do
-#          @request = Object.new
-#          @response = Object.new
-#          mock(response).body {""}
-#          mock(Net::HTTP).start(DEFAULT_HOST, DEFAULT_PORT).yields(request) {response}
-#          stub(Client).puts
-#        end
-#
-#      describe "when passed a custom spec_url" do
-#        it "passes the spec_url as a post parameter" do
-#          spec_url = 'http://foobar.com/foo'
-#          mock(request).post(
-#            "/runners/firefox",
-#            "selenium_host=localhost&selenium_port=4444&spec_url=#{CGI.escape(spec_url)}"
-#          )
-#          Client.run_argv(['--spec_url', spec_url])
-#        end
-#      end
-#
-#      describe "when passed a custom selenium host" do
-#        it "passes the selenium_host as a post parameter" do
-#          selenium_host = 'test-runner'
-#          mock(request).post(
-#            "/runners/firefox",
-#            "selenium_host=test-runner&selenium_port=4444"
-#          )
-#          Client.run_argv(['--selenium_host', selenium_host])
-#        end
-#      end
-#
-#      describe "when passed a custom selenium port" do
-#        it "passes the selenium_port as a post parameter" do
-#          selenium_port = 5000
-#          mock(request).post(
-#            "/runners/firefox",
-#            "selenium_host=localhost&selenium_port=5000"
-#          )
-#          Client.run_argv(['--selenium_port', selenium_port.to_s])
-#        end
-#      end
-#    end
+
+    describe ".run_argv" do
+      attr_reader :request, :response
+      before do
+        stub(Client).puts
+      end
+
+      describe "when passed a custom spec_url" do
+        it "passes the spec_url as a post parameter" do
+          spec_url = 'http://foobar.com/foo'
+          mock(Client).run(:spec_url => spec_url)
+          client = Client.run_argv(['--spec_url', spec_url])
+        end
+      end
+
+      describe "when passed a custom selenium host" do
+        it "passes the selenium_host as a post parameter" do
+          selenium_host = 'test-runner'
+          mock(Client).run(:selenium_host => selenium_host)
+          client = Client.run_argv(['--selenium_host', selenium_host])
+        end
+      end
+
+      describe "when passed a custom selenium port" do
+        it "passes the selenium_port as a post parameter" do
+          selenium_port = "5000"
+          mock(Client).run(:selenium_port => selenium_port)
+          client = Client.run_argv(['--selenium_port', selenium_port])
+        end
+      end
+    end
 
     describe '#parts_from_query' do
       attr_reader :client
