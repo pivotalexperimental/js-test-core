@@ -1,5 +1,11 @@
 module JsTestCore
   class Client
+    class ClientException < Exception
+    end
+
+    class InvalidStatusResponse < ClientException
+    end
+    
     class << self
       def run(parameters={})
         new(parameters).run
@@ -31,6 +37,10 @@ module JsTestCore
       end
     end
 
+    RUNNING = 'running'
+    SUCCESSFUL_COMPLETION = 'success'
+    FAILURE_COMPLETION = 'failure'
+
     attr_reader :parameters, :http, :suite_start_response, :last_poll_result
     def initialize(parameters)
       @parameters = parameters
@@ -38,19 +48,10 @@ module JsTestCore
 
     def run
       Net::HTTP.start(DEFAULT_HOST, DEFAULT_PORT) do |@http|
-        suite_start_response = start_firefox_runner
+        start_firefox_runner
         wait_for_suite_to_finish
       end
-
-      #        body = response.body
-      #        if body.empty?
-      #          STDOUT.puts "SUCCESS"
-      #          return true
-      #        else
-      #          STDOUT.puts "FAILURE"
-      #          STDOUT.puts body
-      #          return false
-      #        end      
+      report_result
     end
 
     def parts_from_query(query)
@@ -67,7 +68,24 @@ module JsTestCore
     end
 
     def wait_for_suite_to_finish
-      poll until last_poll_result == 'completed'
+      poll while suite_not_completed?
+    end
+
+    def report_result
+      case last_poll_result
+      when SUCCESSFUL_COMPLETION
+        STDOUT.puts "SUCCESS"
+        true
+      when FAILURE_COMPLETION
+        STDOUT.puts "FAILURE"
+        false
+      else
+        raise InvalidStatusResponse, "Invalid Status: #{last_poll_result}"
+      end
+    end
+
+    def suite_not_completed?
+      last_poll_result.nil? || last_poll_result == RUNNING
     end
 
     def poll

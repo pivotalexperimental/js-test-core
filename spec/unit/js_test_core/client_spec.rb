@@ -3,45 +3,93 @@ require File.expand_path("#{File.dirname(__FILE__)}/../unit_spec_helper")
 module JsTestCore
   describe Client do
     describe '.run' do
-      attr_reader :stdout
+      attr_reader :stdout, :request
       before do
         @stdout = StringIO.new
         Client.const_set(:STDOUT, stdout)
+        @request = "http request"
+        mock(Net::HTTP).start(DEFAULT_HOST, DEFAULT_PORT).yields(request)
       end
 
       after do
         Client.__send__(:remove_const, :STDOUT)
       end
 
-      it "tells the server to start a suite run in Firefox" do
-        request = "http request"
+      it "tells the server to start a suite run in Firefox and polls the status of the suite until the suite is complete" do
+        mock_post_to_firefox_runner
+        mock_polling_returns([running_status, running_status, success_status])
+        Client.run
+      end
+
+      context "when the Suite run ends in 'success'" do
+        before do
+          mock_post_to_firefox_runner
+          mock_polling_returns([running_status, running_status, success_status])
+        end
+
+        it "reports success" do
+          Client.run
+          stdout.string.strip.should == "SUCCESS"
+        end
+
+        it "returns true" do
+          Client.run.should be_true
+        end
+      end
+
+      context "when the Suite run ends in 'failure'" do
+        attr_reader :failure_reason
+        before do
+          mock_post_to_firefox_runner
+          @failure_reason = "I have a failed test"
+          mock_polling_returns([running_status, running_status, failure_status(failure_reason)])
+        end
+
+        it "reports failure" do
+          Client.run
+          stdout.string.strip.should == "FAILURE"
+        end
+
+        it "returns false" do
+          Client.run.should be_false
+        end
+
+        it "reports the reason for failure"
+      end
+
+      context "when the Suite run ends in with invalid status" do
+        it "raises an InvalidStatusResponse" do
+          mock_post_to_firefox_runner
+          mock_polling_returns([running_status, running_status, "status=this is an unexpected status result"])
+          lambda {Client.run}.should raise_error(Client::InvalidStatusResponse)
+        end
+      end
+
+      def mock_post_to_firefox_runner
         mock(start_suite_response = Object.new).body {"suite_id=my_suite_id"}
         mock(request).post("/runners/firefox", "selenium_host=localhost&selenium_port=4444") do
           start_suite_response
         end
-        mock(Net::HTTP).start(DEFAULT_HOST, DEFAULT_PORT).yields(request)
-
-        stub(request).get do
-          stub(suite_response = Object.new).body {"status=completed"}
-          suite_response
-        end
-        Client.run
       end
 
-      it "polls the status of the suite until the suite is complete" do
-        request = "http request"
-        stub(start_suite_response = Object.new).body {"suite_id=my_suite_id"}
-        stub(request).post {start_suite_response}
-
-        suite_statuses = ["status=running", "status=running", "status=completed"]
+      def mock_polling_returns(suite_statuses=[])
         mock(request).get("/suites/my_suite_id") do
           stub(suite_response = Object.new).body {suite_statuses.shift}
           suite_response
-        end.times(3)
-        mock(Net::HTTP).start(DEFAULT_HOST, DEFAULT_PORT).yields(request)
-
-        Client.run
+        end.times(suite_statuses.length)
       end
+
+      def running_status
+        "status=#{Client::RUNNING}"
+      end
+
+      def success_status
+        "status=#{Client::SUCCESSFUL_COMPLETION}"
+      end
+
+      def failure_status(reason)
+        "status=#{Client::FAILURE_COMPLETION}&reason=#{reason}"
+      end      
 
 #      context 'when successful' do
 #        before do
