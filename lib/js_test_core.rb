@@ -19,6 +19,7 @@ require "#{dir}/js_test_core/resources"
 require "#{dir}/js_test_core/selenium"
 
 require "#{dir}/js_test_core/client"
+require "#{dir}/js_test_core/selenium_server_configuration"
 require "#{dir}/js_test_core/server"
 require "#{dir}/js_test_core/rails_server"
 

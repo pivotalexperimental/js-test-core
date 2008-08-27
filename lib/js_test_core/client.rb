@@ -1,24 +1,8 @@
 module JsTestCore
   class Client
     class << self
-      def run(params={})
-        data = []
-        data << "selenium_host=#{CGI.escape(params[:selenium_host] || 'localhost')}"
-        data << "selenium_port=#{CGI.escape((params[:selenium_port] || 4444).to_s)}"
-        data << "spec_url=#{CGI.escape(params[:spec_url])}" if params[:spec_url]
-        response = Net::HTTP.start(DEFAULT_HOST, DEFAULT_PORT) do |http|
-          http.post('/runners/firefox', data.join("&"))
-        end
-
-        body = response.body
-        if body.empty?
-          puts "SUCCESS"
-          return true
-        else
-          puts "FAILURE"
-          puts body
-          return false
-        end
+      def run(parameters={})
+        new(parameters).run
       end
 
       def run_argv(argv)
@@ -45,6 +29,53 @@ module JsTestCore
         parser.order!(argv)
         run params
       end
+    end
+
+    attr_reader :parameters, :http, :suite_start_response, :last_poll_result
+    def initialize(parameters)
+      @parameters = parameters
+    end
+
+    def run
+      Net::HTTP.start(DEFAULT_HOST, DEFAULT_PORT) do |@http|
+        suite_start_response = start_firefox_runner
+        wait_for_suite_to_finish
+      end
+
+      #        body = response.body
+      #        if body.empty?
+      #          STDOUT.puts "SUCCESS"
+      #          return true
+      #        else
+      #          STDOUT.puts "FAILURE"
+      #          STDOUT.puts body
+      #          return false
+      #        end      
+    end
+
+    def parts_from_query(query)
+      query.split('&').inject({}) do |acc, key_value_pair|
+        key, value = key_value_pair.split('=')
+        acc[key] = value
+        acc
+      end
+    end
+    
+    protected
+    def start_firefox_runner
+      @suite_start_response = http.post('/runners/firefox', SeleniumServerConfiguration.query_string_from(parameters))
+    end
+
+    def wait_for_suite_to_finish
+      poll until last_poll_result == 'completed'
+    end
+
+    def poll
+      @last_poll_result = parts_from_query(http.get("/suites/#{suite_id}").body)['status']
+    end
+
+    def suite_id
+      @suite_id ||= parts_from_query(suite_start_response.body)['suite_id']
     end
   end
 end
