@@ -30,11 +30,12 @@ module JsTestCore
         end
 
         def post
-          spec_url = (rack_request && rack_request['spec_url']) ? rack_request['spec_url'] : spec_suite_url
+          spec_url = rack_request['spec_url'].to_s == "" ? spec_suite_url : rack_request['spec_url']
           parsed_spec_url = URI.parse(spec_url)
-          selenium_port = (rack_request['selenium_port'] || 4444).to_i
+          selenium_host = rack_request['selenium_host'].to_s == "" ? 'localhost' : rack_request['selenium_host'].to_s
+          selenium_port = rack_request['selenium_port'].to_s == "" ? 4444 : Integer(rack_request['selenium_port'])
           @driver = Selenium::SeleniumDriver.new(
-            rack_request['selenium_host'] || 'localhost',
+            selenium_host,
             selenium_port,
             '*firefox',
             "#{parsed_spec_url.scheme}://#{parsed_spec_url.host}:#{parsed_spec_url.port}"

@@ -49,11 +49,8 @@ module JsTestCore
         end
       end
 
-      describe "#post" do
-        attr_reader :firefox_profile_path
+      describe "POST /runners/firefox" do
         before do
-          @request = connection.rack_request
-          @runner = Runners::FirefoxRunner.new(:connection => connection)
           stub(Thread).start.yields
         end
 
@@ -63,12 +60,11 @@ module JsTestCore
           stub(driver).session_id {suite_id}
           dont_allow(EventMachine).send_data
           dont_allow(EventMachine).close_connection
-          runner.post
+          connection.receive_data("POST /runners/firefox HTTP/1.1\r\nHost: _\r\n\r\n")
         end
         
         describe "when a selenium_host parameter is passed into the request" do
           before do
-            request['selenium_host'] = "another-machine"
             stub(driver).start
             stub(driver).open
             stub(driver).session_id {suite_id}
@@ -78,13 +74,13 @@ module JsTestCore
             mock(Selenium::SeleniumDriver).new('another-machine', 4444, '*firefox', 'http://0.0.0.0:8080') do
               driver
             end
-            runner.post
+            body = "selenium_host=another-machine"
+            connection.receive_data("POST /runners/firefox HTTP/1.1\r\nHost: _\r\nContent-Length: #{body.length}\r\n\r\n#{body}")
           end
         end
 
         describe "when a selenium_host parameter is not passed into the request" do
           before do
-            request['selenium_host'].should be_nil
             stub(driver).start
             stub(driver).open
             stub(driver).session_id {suite_id}
@@ -94,13 +90,13 @@ module JsTestCore
             mock(Selenium::SeleniumDriver).new('localhost', 4444, '*firefox', 'http://0.0.0.0:8080') do
               driver
             end
-            runner.post
+            body = "selenium_host="
+            connection.receive_data("POST /runners/firefox HTTP/1.1\r\nHost: _\r\nContent-Length: #{body.length}\r\n\r\n#{body}")
           end
         end
 
         describe "when a selenium_port parameter is passed into the request" do
           before do
-            request['selenium_port'] = "4000"
             stub(driver).start
             stub(driver).open
             stub(driver).session_id {suite_id}
@@ -110,13 +106,13 @@ module JsTestCore
             mock(Selenium::SeleniumDriver).new('localhost', 4000, '*firefox', 'http://0.0.0.0:8080') do
               driver
             end
-            runner.post
+            body = "selenium_port=4000"
+            connection.receive_data("POST /runners/firefox HTTP/1.1\r\nHost: _\r\nContent-Length: #{body.length}\r\n\r\n#{body}")
           end
         end
 
         describe "when a selenium_port parameter is not passed into the request" do
           before do
-            request['selenium_port'].should be_nil
             stub(driver).start
             stub(driver).open
             stub(driver).session_id {suite_id}
@@ -126,15 +122,12 @@ module JsTestCore
             mock(Selenium::SeleniumDriver).new('localhost', 4444, '*firefox', 'http://0.0.0.0:8080') do
               driver
             end
-            runner.post
+            body = "selenium_port="
+            connection.receive_data("POST /runners/firefox HTTP/1.1\r\nHost: _\r\nContent-Length: #{body.length}\r\n\r\n#{body}")
           end
         end
 
         describe "when a spec_url is passed into the request" do
-          before do
-            request['spec_url'] = "http://another-host:8080/specs/subdir"
-          end
-
           it "runs Selenium with the passed in host and part to run the specified spec suite in Firefox" do
             mock(Selenium::SeleniumDriver).new('localhost', 4444, '*firefox', 'http://another-host:8080') do
               driver
@@ -143,13 +136,13 @@ module JsTestCore
             mock(driver).open("http://another-host:8080/specs/subdir")
             mock(driver).session_id {suite_id}
 
-            runner.post
+            body = "spec_url=http://another-host:8080/specs/subdir"
+            connection.receive_data("POST /runners/firefox HTTP/1.1\r\nHost: _\r\nContent-Length: #{body.length}\r\n\r\n#{body}")
           end
         end
 
         describe "when a spec_url is not passed into the request" do
           before do
-            request['spec_url'].should be_nil
             mock(Selenium::SeleniumDriver).new('localhost', 4444, '*firefox', 'http://0.0.0.0:8080') do
               driver
             end
@@ -160,7 +153,8 @@ module JsTestCore
             mock(driver).open("http://0.0.0.0:8080/specs")
             mock(driver).session_id {suite_id}
 
-            runner.post
+            body = "spec_url="
+            connection.receive_data("POST /runners/firefox HTTP/1.1\r\nHost: _\r\nContent-Length: #{body.length}\r\n\r\n#{body}")
           end
         end
       end
