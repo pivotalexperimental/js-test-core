@@ -7,20 +7,10 @@ module JsTestCore
         end
       end
 
-      class << self
-        def locate(id)
-          new id
-        end
-      end
-
       property :id
-      
-      def locate(name)
-        if name == 'finish'
-          SuiteFinish.new self
-        else
-          raise ArgumentError, "Invalid path: #{name}"
-        end
+
+      route 'finish' do |env, name|
+        SuiteFinish.new(env.merge(:suite => self))
       end
     end
   end

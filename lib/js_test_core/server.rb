@@ -54,20 +54,5 @@ module JsTestCore
     def test_file_class
       JsTestCore.adapter.test_file_class
     end
-    
-    protected
-    def path_parts(req)
-      request.path_info.split('/').reject { |part| part == "" }
-    end
-
-    def get_resource(request)
-      path_parts(request).inject(Resources::WebRoot.new(:public_path => public_path)) do |resource, child_resource_name|
-        resource.locate(child_resource_name)
-      end
-    rescue Exception => e
-      detailed_exception = Exception.new("Error handling path #{request.path_info}\n#{e.message}")
-      detailed_exception.set_backtrace(e.backtrace)
-      raise detailed_exception
-    end
   end
 end

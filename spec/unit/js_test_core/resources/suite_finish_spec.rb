@@ -22,17 +22,14 @@ module JsTestCore
 
           it "writes the body of the request to stdout" do
             body = "The text in the POST body"
-            request = Rack::Request.new({'rack.input' => StringIO.new("text=#{body}")})
-            request.body.string.should == "text=#{body}"
-            response = Rack::Response.new
+            connection.rack_request['text'] = body
 
             suite_finish.post
             stdout.string.should == "#{body}\n"
           end
 
           it "sets the Content-Length to be 0" do
-            request = Rack::Request.new('rack.input' => StringIO.new(""))
-            response = Rack::Response.new
+            response = connection.response
 
             response.headers.to_s.should_not include("Content-Length: ")
             suite_finish.post
