@@ -5,7 +5,7 @@ module JsTestCore
     describe WebRoot do
       attr_reader :web_root
       before(:each) do
-        @web_root = WebRoot.new(public_path)
+        @web_root = WebRoot.new(:connection => connection, :public_path => public_path)
       end
 
       describe "#locate" do
@@ -18,21 +18,29 @@ module JsTestCore
         describe "when passed 'core'" do
           it "returns a Dir representing the JsTestCore core directory" do
             runner = web_root.locate('core')
-            runner.should == Resources::Dir.new(JsTestCore::Server.core_path, '/core')
+            runner.should == Resources::Dir.new(
+              :connection => connection,
+              :absolute_path => JsTestCore::Server.core_path,
+              :relative_path => '/core'
+            )
           end
         end
 
         describe "when passed 'implementations'" do
           it "returns a Dir representing the javascript implementations directory" do
             runner = web_root.locate('implementations')
-            runner.should == Resources::Dir.new(JsTestCore::Server.implementation_root_path, '/implementations')
+            runner.should == Resources::Dir.new(
+              :connection => connection,
+              :absolute_path => JsTestCore::Server.implementation_root_path,
+              :relative_path => '/implementations'
+            )
           end
         end
 
         describe "when passed 'results'" do
-          it "returns a Suite" do
+          it "returns a Suite::Collection" do
             runner = web_root.locate('suites')
-            runner.should == Resources::Suite
+            runner.class.should == Resources::Suite::Collection
           end
         end
 
@@ -46,14 +54,22 @@ module JsTestCore
         describe "when passed a directory that is in the public_path" do
           it "returns a Dir representing that directory" do
             runner = web_root.locate('stylesheets')
-            runner.should == Resources::Dir.new("#{JsTestCore::Server.public_path}/stylesheets", '/stylesheets')
+            runner.should == Resources::Dir.new(
+              :connection => connection,
+              :absolute_path => "#{JsTestCore::Server.public_path}/stylesheets",
+              :relative_path => '/stylesheets'
+            )
           end
         end
 
         describe "when passed a file that is in the public_path" do
           it "returns a File representing that file" do
             runner = web_root.locate('robots.txt')
-            runner.should == Resources::File.new("#{JsTestCore::Server.public_path}/robots.txt", '/robots.txt')
+            runner.should == Resources::File.new(
+              :connection => connection,
+              :absolute_path => "#{JsTestCore::Server.public_path}/robots.txt",
+              :relative_path => '/robots.txt'
+            )
           end
         end
 
@@ -75,11 +91,10 @@ module JsTestCore
 
           it "redirects to /specs" do
             WebRoot.dispatch_specs
+            mock(connection).send_head(301, :Location => '/specs')
+            mock(connection).send_body("<script type='text/javascript'>window.location.href='/specs';</script>")
 
-            web_root.get(request, response)
-            response.should be_redirect
-            response.headers["Location"].should == "/specs"
-            response.body.should == "<script type='text/javascript'>window.location.href='/specs';</script>"
+            web_root.get
           end
         end
 

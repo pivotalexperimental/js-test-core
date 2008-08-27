@@ -1,6 +1,12 @@
 module JsTestCore
   module Resources
     class Suite < ThinRest::Resource
+      class Collection < ThinRest::Resource
+        route ANY do |env, name|
+          Suite.new(env.merge(:name => name))
+        end
+      end
+
       class << self
         def locate(id)
           new id

@@ -9,9 +9,8 @@ module JsTestCore
         WebRoot.dispatch_specs
         stub(EventMachine).send_data
         stub(EventMachine).close_connection
-        @request = create_request('get', '/invalid')
-        @response = Rack::Response.new
-        @file_not_found = FileNotFound.new('invalid')
+        @response = connection.response
+        @file_not_found = FileNotFound.new(:connection => connection, :name => 'invalid')
       end
 
       describe "#get" do

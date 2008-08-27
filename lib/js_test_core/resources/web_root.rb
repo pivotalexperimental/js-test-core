@@ -1,6 +1,9 @@
 module JsTestCore
   module Resources
     class WebRoot < ThinRest::Resource
+      route "" do |env, name|
+        self
+      end
       route "core" do |env, name|
         Resources::Dir.new(env.merge(
           :absolute_path => JsTestCore::Server.core_path,
@@ -13,13 +16,17 @@ module JsTestCore
           :relative_path => "/implementations"
         ))
       end
-      route "suites", "JsTestCore::Resources::Suite"
+      route "suites", "JsTestCore::Resources::Suite::Collection"
       route "runners", "JsTestCore::Resources::Runners"
       route "specs" do |env, name|
-        Resources::Dir.new(env.merge(
-          :absolute_path => JsTestCore::Server.spec_root_path,
-          :relative_path => "/specs"
-        ))
+        if self.class.dispatch_strategy == :specs
+          Resources::Specs::SpecDir.new(env.merge(
+            :absolute_path => JsTestCore::Server.spec_root_path,
+            :relative_path => "/specs"
+          ))
+        else
+          Resources::FileNotFound.new(env.merge(:name => name))
+        end
       end
       route ANY do |env, name|
         potential_file_in_public_path = "#{public_path}/#{name}"
@@ -48,9 +55,8 @@ module JsTestCore
       property :public_path
 
       def get
-        response.status = 301
-        response['Location'] = "/#{self.class.dispatch_strategy}"
-        response.body = "<script type='text/javascript'>window.location.href='/specs';</script>"
+        connection.send_head(301, :Location => "/#{self.class.dispatch_strategy}")
+        connection.send_body("<script type='text/javascript'>window.location.href='/specs';</script>")
       end
     end
   end

@@ -61,7 +61,7 @@ module JsTestCore
     end
 
     def get_resource(request)
-      path_parts(request).inject(Resources::WebRoot.new(public_path)) do |resource, child_resource_name|
+      path_parts(request).inject(Resources::WebRoot.new(:public_path => public_path)) do |resource, child_resource_name|
         resource.locate(child_resource_name)
       end
     rescue Exception => e
