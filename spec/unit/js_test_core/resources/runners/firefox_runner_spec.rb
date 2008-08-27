@@ -3,7 +3,7 @@ require File.expand_path("#{File.dirname(__FILE__)}/../../../unit_spec_helper")
 module JsTestCore
   module Resources
     describe Runners::FirefoxRunner do
-      attr_reader :runner, :request, :response, :driver, :suite_id
+      attr_reader :runner, :request, :driver, :suite_id
       
       before do
         @driver = "Selenium Driver"
@@ -25,7 +25,7 @@ module JsTestCore
             stub(driver).open
             stub(driver).session_id {suite_id}
             stub(driver).stop
-            stub(EventMachine).send_data
+            stub_send_data
             stub(EventMachine).close_connection
 
             runner.post
@@ -52,8 +52,7 @@ module JsTestCore
       describe "#post" do
         attr_reader :firefox_profile_path
         before do
-          @request = Rack::Request.new( Rack::MockRequest.env_for('/runners/firefox') )
-          @response = Rack::Response.new
+          @request = connection.rack_request
           @runner = Runners::FirefoxRunner.new(:connection => connection)
           stub(Thread).start.yields
         end
@@ -65,8 +64,6 @@ module JsTestCore
           dont_allow(EventMachine).send_data
           dont_allow(EventMachine).close_connection
           runner.post
-
-          response.body.should be_empty
         end
         
         describe "when a selenium_host parameter is passed into the request" do
@@ -170,8 +167,7 @@ module JsTestCore
 
       describe "#finalize" do
         before do
-          @request = Rack::Request.new( Rack::MockRequest.env_for('/runners/firefox') )
-          @response = Rack::Response.new
+          @request = connection.rack_request
           @runner = Runners::FirefoxRunner.new(:connection => connection)
           stub(driver).start
           stub(driver).open

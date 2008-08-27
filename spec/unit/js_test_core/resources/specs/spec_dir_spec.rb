@@ -8,7 +8,7 @@ module JsTestCore
         before do
           @absolute_path = spec_root_path
           @relative_path = "/specs"
-          @dir = Resources::Specs::SpecDir.new(absolute_path, relative_path)
+          @dir = Resources::Specs::SpecDir.new(:connection => connection, :absolute_path => absolute_path, :relative_path => relative_path)
         end
 
         it "has an absolute path" do
@@ -53,7 +53,7 @@ module JsTestCore
 
           it "raises NotImplementedError" do
             lambda do
-              dir.get(request, response)
+              dir.get
             end.should raise_error(NotImplementedError)
           end
 
@@ -66,10 +66,10 @@ module JsTestCore
             spec_dir_class.class_eval do
               include mod
             end
-            @dir = spec_dir_class.new(absolute_path, relative_path)
+            @dir = spec_dir_class.new(:connection => connection, :absolute_path => absolute_path, :relative_path => relative_path)
 
             lambda do
-              dir.get(request, response)
+              dir.get
             end.should_not raise_error
           end
         end

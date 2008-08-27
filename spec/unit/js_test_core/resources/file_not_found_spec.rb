@@ -16,7 +16,7 @@ module JsTestCore
 
       describe "#get" do
         it "returns a 404 response code with an error message" do
-          file_not_found.get(request, response)
+          file_not_found.get
           response.status.should == 404
           response.body.should include("Path invalid not found. You may want to try the /specs directory.")
         end

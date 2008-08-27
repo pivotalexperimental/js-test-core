@@ -2,9 +2,9 @@ module JsTestCore
   module Resources
     class Dir < File
       route ANY do |env, name|
-        if file = file(env, name)
+        if file = file(name)
           file
-        elsif subdir = subdir(env, name)
+        elsif subdir = subdir(name)
           subdir
         else
           raise "No file or directory found at #{relative_path}/#{name}."
@@ -33,7 +33,7 @@ module JsTestCore
         [absolute_child_path, relative_child_path]
       end
 
-      def file(env, name)
+      def file(name)
         absolute_path, relative_path = determine_child_paths(name)
         if ::File.exists?(absolute_path) && !::File.directory?(absolute_path)
           Resources::File.new(env.merge(
@@ -45,7 +45,7 @@ module JsTestCore
         end
       end
 
-      def subdir(env, name)
+      def subdir(name)
         absolute_dir_path, relative_dir_path = determine_child_paths(name)
         if ::File.directory?(absolute_dir_path)
           Resources::Dir.new(env.merge(

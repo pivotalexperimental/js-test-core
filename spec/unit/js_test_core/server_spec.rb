@@ -13,20 +13,26 @@ module JsTestCore
     end
 
     describe "HTTP GET" do
-      specify "'/core/JsTestCore.js', returns the contents of the file" do
-        response = get("/core/JsTestCore.js")
-        response.body.should == ::File.read("#{Server.core_path}/JsTestCore.js")
+      context "/core/JsTestCore.js" do
+        it "returns the contents of the file" do
+          response = get("/core/JsTestCore.js")
+          response.body.should == ::File.read("#{Server.core_path}/JsTestCore.js")
+        end
       end
 
-      specify "'/stylesheets/example.css', returns the contents of the file" do
-        response = get("/stylesheets/example.css")
-        response.body.should == ::File.read("#{Server.public_path}/stylesheets/example.css")
+      context "/stylesheets/example.css" do
+        it "returns the contents of the file" do
+          response = get("/stylesheets/example.css")
+          response.body.should == ::File.read("#{Server.public_path}/stylesheets/example.css")
+        end
       end
 
-      specify "'/invalid/path', shows the full invalid path in the error message" do
-        lambda do
+      context "/invalid/path" do
+        self.thin_logging = false
+        it "shows the full invalid path in the error message" do
+          mock.proxy(connection).log_error(is_a(ThinRest::RoutingError))
           get("/invalid/path")
-        end.should raise_error(Exception, Regexp.new("/invalid/path"))
+        end
       end
     end
 
@@ -100,24 +106,28 @@ module JsTestCore
         end
 
         it "shows the full request path in the error message" do
-          lambda do
-            get('/somedir')
-          end.should raise_error(Exception, Regexp.new("/somedir"))
+          error = nil
+          mock(connection).log_error(is_a(Exception)) do |error_arg|
+            error = error_arg
+          end
+          
+          get('/somedir')
+          error.message.should =~ Regexp.new("/somedir")
         end
 
         it "uses the backtrace from where the original error was raised" do
-          no_error = true
-          begin
-            get('/somedir')
-          rescue Exception => e
-            no_error = false
-            top_of_backtrace = e.backtrace.first.split(":")
-            backtrace_file = ::File.expand_path(top_of_backtrace[0])
-            backtrace_line = Integer(top_of_backtrace[1])
-            backtrace_file.should == __FILE__
-            backtrace_line.should == top_line_of_backtrace
+          error = nil
+          mock(connection).log_error(is_a(Exception)) do |error_arg|
+            error = error_arg
           end
-          raise "There should have been an error" if no_error
+
+          get('/somedir')
+          no_error = false
+          top_of_backtrace = error.backtrace.first.split(":")
+          backtrace_file = ::File.expand_path(top_of_backtrace[0])
+          backtrace_line = Integer(top_of_backtrace[1])
+          backtrace_file.should == __FILE__
+          backtrace_line.should == top_line_of_backtrace
         end
       end
     end
