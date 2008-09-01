@@ -24,6 +24,7 @@ module JsTestCore
         end
 
         include FileUtils
+        property :selenium_browser_start_command
         attr_reader :profile_dir, :driver, :suite_run_result
 
         def after_initialize
@@ -78,10 +79,6 @@ module JsTestCore
         end
 
         protected
-
-        def selenium_browser_start_command
-          raise NotImplementedError
-        end
 
         def spec_suite_url
           "#{Server.root_url}/specs"
