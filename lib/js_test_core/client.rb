@@ -21,8 +21,8 @@ module JsTestCore
           o.banner << "\nUsage: #{$0} [options] [-- untouched arguments]"
 
           o.on
-          o.on('-s', '--selenium_server_start_command=SELENIUM_SERVER_START_COMMAND', "The Selenium server command to start the browser. See http://selenium-rc.openqa.org/") do |selenium_server_start_command|
-            params[:selenium_server_start_command] = selenium_server_start_command
+          o.on('-s', '--selenium_browser_start_command=selenium_browser_start_command', "The Selenium server command to start the browser. See http://selenium-rc.openqa.org/") do |selenium_browser_start_command|
+            params[:selenium_browser_start_command] = selenium_browser_start_command
           end
 
           o.on('-h', '--selenium_host=SELENIUM_HOST', "The host name of the Selenium Server relative to where this file is executed") do |host|

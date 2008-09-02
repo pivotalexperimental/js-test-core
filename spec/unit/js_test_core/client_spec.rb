@@ -77,9 +77,9 @@ module JsTestCore
         end
       end
 
-      def mock_post_to_runner(selenium_server_start_command)
+      def mock_post_to_runner(selenium_browser_start_command)
         mock(start_suite_response = Object.new).body {"suite_id=my_suite_id"}
-        mock(request).post("/runners", "selenium_server_start_command=#{CGI.escape(selenium_server_start_command)}&selenium_host=localhost&selenium_port=4444") do
+        mock(request).post("/runners", "selenium_browser_start_command=#{CGI.escape(selenium_browser_start_command)}&selenium_host=localhost&selenium_port=4444") do
           start_suite_response
         end
       end
@@ -111,11 +111,11 @@ module JsTestCore
         stub(Client).puts
       end
 
-      describe "when passed in Hash contains :selenium_server_start_command" do
+      describe "when passed in Hash contains :selenium_browser_start_command" do
         it "passes the spec_url as a post parameter" do
-          selenium_server_start_command = '*iexplore'
-          mock(Client).run(:selenium_server_start_command => selenium_server_start_command)
-          client = Client.run_argv(['--selenium_server_start_command', selenium_server_start_command])
+          selenium_browser_start_command = '*iexplore'
+          mock(Client).run(:selenium_browser_start_command => selenium_browser_start_command)
+          client = Client.run_argv(['--selenium_browser_start_command', selenium_browser_start_command])
         end
       end
 
