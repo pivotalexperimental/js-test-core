@@ -2,7 +2,7 @@ require File.expand_path("#{File.dirname(__FILE__)}/../../../unit_spec_helper")
 
 module JsTestCore
   module Resources
-    describe Runners::Runner do
+    describe Runner do
       attr_reader :request, :driver, :suite_id, :selenium_browser_start_command, :body
 
       def self.before_with_selenium_browser_start_command(selenium_browser_start_command="selenium browser start command")
@@ -18,29 +18,29 @@ module JsTestCore
       end
 
       after do
-        Runners::Runner.send(:instances).clear
+        Runner.send(:instances).clear
       end
 
       describe ".find" do
         attr_reader :runner
         before_with_selenium_browser_start_command
         before do
-          @runner = Runners::Runner.new(:connection => connection, :selenium_browser_start_command => selenium_browser_start_command)
+          @runner = Runner.new(:connection => connection, :selenium_browser_start_command => selenium_browser_start_command)
           stub(runner).driver {driver}
           stub(driver).session_id {suite_id}
-          Runners::Runner.register(runner)
+          Runner.register(runner)
         end
         
         context "when passed an id for which there is a corresponding Runner" do
           it "returns the Runner" do
-            Runners::Runner.find(suite_id).should == runner
+            Runner.find(suite_id).should == runner
           end
         end
 
         context "when passed an id for which there is no corresponding Runner" do
           it "returns nil" do
             invalid_id = "666666666666666"
-            Runners::Runner.find(invalid_id).should be_nil
+            Runner.find(invalid_id).should be_nil
           end
         end
       end
@@ -50,27 +50,27 @@ module JsTestCore
         before_with_selenium_browser_start_command
         describe "when there is a runner for the passed in suite_id" do
           before do
-            @runner = Runners::Runner.new(:connection => connection, :selenium_browser_start_command => selenium_browser_start_command)
+            @runner = Runner.new(:connection => connection, :selenium_browser_start_command => selenium_browser_start_command)
             stub(runner).driver {driver}
             stub(driver).session_id {"DEADBEEF"}
 
-            Runners::Runner.register(runner)
+            Runner.register(runner)
             runner.suite_id.should == suite_id
           end
 
           it "finalizes the Runner that has the suite_id and keeps the Runner in memory" do
             mock(driver).stop
             mock.proxy(runner).finalize("Browser output")
-            Runners::Runner.find(suite_id).should == runner
-            Runners::Runner.finalize(suite_id, "Browser output")
-            Runners::Runner.find(suite_id).should == runner
+            Runner.find(suite_id).should == runner
+            Runner.finalize(suite_id, "Browser output")
+            Runner.find(suite_id).should == runner
           end
         end
 
         describe "when there is not a runner for the passed in suite_id" do
           it "does nothing" do
             lambda do
-              Runners::Runner.finalize("6666666", "nothing happens")
+              Runner.finalize("6666666", "nothing happens")
             end.should_not raise_error
           end
         end
@@ -193,7 +193,7 @@ module JsTestCore
       describe "POST /runners/firefox" do
         before_with_selenium_browser_start_command "*firefox"
 
-        it "creates a Runner whose #selenium_browser_start_command is set to '*firefox'" do
+        it "creates a Runner whose #driver started with '*firefox'" do
           stub(Thread).start.yields
           stub(connection).send_head
           stub(connection).send_body
@@ -205,18 +205,18 @@ module JsTestCore
           mock(connection).send_head
           mock(connection).send_body("suite_id=#{suite_id}")
 
-          Runners::Runner.find(suite_id).should be_nil
+          Runner.find(suite_id).should be_nil
           connection.receive_data("POST /runners/firefox HTTP/1.1\r\nHost: _\r\n\r\n")
-          runner = Runners::Runner.find(suite_id)
-          runner.class.should == Runners::Runner
-          runner.selenium_browser_start_command.should == "*firefox"
+          runner = Runner.find(suite_id)
+          runner.class.should == Runner
+          runner.driver.should == driver
         end
       end
 
       describe "POST /runners/iexplore" do
         before_with_selenium_browser_start_command "*iexplore"
 
-        it "creates a Runner whose #selenium_browser_start_command is set to '*iexplore'" do
+        it "creates a Runner whose #driver started with '*iexplore'" do
           stub(Thread).start.yields
           stub(connection).send_head
           stub(connection).send_body
@@ -228,11 +228,11 @@ module JsTestCore
           mock(connection).send_head
           mock(connection).send_body("suite_id=#{suite_id}")
 
-          Runners::Runner.find(suite_id).should be_nil
+          Runner.find(suite_id).should be_nil
           connection.receive_data("POST /runners/iexplore HTTP/1.1\r\nHost: _\r\n\r\n")
-          runner = Runners::Runner.find(suite_id)
-          runner.class.should == Runners::Runner
-          runner.selenium_browser_start_command.should == "*iexplore"
+          runner = Runner.find(suite_id)
+          runner.class.should == Runner
+          runner.driver.should == driver
         end
       end
 
@@ -248,7 +248,7 @@ module JsTestCore
           stub(create_runner_connection).send_head
           stub(create_runner_connection).send_body
           create_runner_connection.receive_data("POST /runners HTTP/1.1\r\nHost: _\r\nContent-Length: #{body.length}\r\n\r\n#{body}")
-          @runner = Resources::Runners::Runner.find(suite_id)
+          @runner = Resources::Runner.find(suite_id)
           mock(driver).stop
         end
 

@@ -1,6 +1,5 @@
 dir = File.dirname(__FILE__)
-require "#{dir}/resources/runners"
-require "#{dir}/resources/runners/runner"
+require "#{dir}/resources/runner"
 require "#{dir}/resources/file"
 require "#{dir}/resources/dir"
 require "#{dir}/resources/file_not_found"
