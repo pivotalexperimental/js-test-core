@@ -22,16 +22,17 @@ module JsTestCore
           parsed_spec_url = URI.parse(spec_url)
           selenium_host = rack_request['selenium_host'].to_s == "" ? 'localhost' : rack_request['selenium_host'].to_s
           selenium_port = rack_request['selenium_port'].to_s == "" ? 4444 : Integer(rack_request['selenium_port'])
+          http_address = "#{parsed_spec_url.scheme}://#{parsed_spec_url.host}:#{parsed_spec_url.port}"
           driver = Selenium::SeleniumDriver.new(
             selenium_host,
             selenium_port,
             selenium_browser_start_command,
-            "#{parsed_spec_url.scheme}://#{parsed_spec_url.host}:#{parsed_spec_url.port}"
+            http_address
           )
           begin
             driver.start
           rescue Errno::ECONNREFUSED => e
-            raise Errno::ECONNREFUSED, "Cannot connect to Selenium Server on port #{selenium_port}. To start the selenium server, run `selenium`."
+            raise Errno::ECONNREFUSED, "Cannot connect to Selenium Server at #{http_address}. To start the selenium server, run `selenium`."
           end
           Thread.start do
             driver.open(spec_url)
