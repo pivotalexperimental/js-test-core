@@ -14,12 +14,16 @@ module JsTestCore
 
 
     def query_string
-      parts = [selenium_host, selenium_port]
+      parts = [selenium_server_start_command, selenium_host, selenium_port]
       parts << spec_url if url
       parts.join('&')
     end
 
     private
+
+    def selenium_server_start_command
+      "selenium_server_start_command=#{parameter_or_default_for(:selenium_server_start_command, '*firefox')}"
+    end
 
     def selenium_host
       "selenium_host=#{parameter_or_default_for(:selenium_host, 'localhost')}"
