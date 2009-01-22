@@ -3,50 +3,50 @@ require File.expand_path("#{File.dirname(__FILE__)}/../../unit_spec_helper")
 module JsTestCore
   module Resources
     describe Suite do
-      describe "GET /suites/:suite_id" do
-        attr_reader :driver, :suite_id
+      describe "GET /suites/:session_id" do
+        attr_reader :driver, :session_id
 
-        context "when there is no Runner with the :suite_id" do
+        context "when there is no Runner with the :session_id" do
           it "responds with a 404" do
-            suite_id = "invalid_suite_id"
-            Runner.find(suite_id).should be_nil
+            session_id = "invalid_session_id"
+            Runner.find(session_id).should be_nil
 
             mock(connection).send_head(404)
             mock(connection).send_body("")
 
-            connection.receive_data("GET /suites/#{suite_id} HTTP/1.1\r\nHost: _\r\n\r\n")
+            connection.receive_data("GET /suites/#{session_id} HTTP/1.1\r\nHost: _\r\n\r\n")
           end
         end
 
-        context "when there is a Runner with the :suite_id" do
+        context "when there is a Runner with the :session_id" do
           attr_reader :suite_runner
           before do
             @driver = "Selenium Driver"
-            @suite_id = "DEADBEEF"
+            @session_id = "DEADBEEF"
             stub(Selenium::SeleniumDriver).new('localhost', 4444, '*firefox', 'http://0.0.0.0:8080') do
               driver
             end
 
             stub(driver).start
-            stub(driver).session_id {suite_id}
+            stub(driver).session_id {session_id}
             connection_that_starts_firefox = create_connection
             stub(connection_that_starts_firefox).send_head
             stub(connection_that_starts_firefox).send_body
             connection_that_starts_firefox.receive_data("POST /runners/firefox HTTP/1.1\r\nHost: _\r\nContent-Length: 0\r\n\r\n")
-            @suite_runner = Runner.find(suite_id)
+            @suite_runner = Runner.find(session_id)
             suite_runner.should be_running
           end
 
-          context "when a Runner with the :suite_id is running" do
+          context "when a Runner with the :session_id is running" do
             it "responds with a 200 and status=running" do
               mock(connection).send_head
               mock(connection).send_body("status=#{Resources::Suite::RUNNING}")
 
-              connection.receive_data("GET /suites/#{suite_id} HTTP/1.1\r\nHost: _\r\n\r\n")
+              connection.receive_data("GET /suites/#{session_id} HTTP/1.1\r\nHost: _\r\n\r\n")
             end
           end
 
-          context "when a Runner with the :suite_id has completed" do
+          context "when a Runner with the :session_id has completed" do
             context "when the suite has a status of 'success'" do
               before do
                 stub(driver).stop
@@ -58,7 +58,7 @@ module JsTestCore
                 mock(connection).send_head
                 mock(connection).send_body("status=#{Resources::Suite::SUCCESSFUL_COMPLETION}")
 
-                connection.receive_data("GET /suites/#{suite_id} HTTP/1.1\r\nHost: _\r\n\r\n")
+                connection.receive_data("GET /suites/#{session_id} HTTP/1.1\r\nHost: _\r\n\r\n")
               end
             end
 
@@ -75,7 +75,7 @@ module JsTestCore
                 mock(connection).send_head
                 mock(connection).send_body("status=#{Resources::Suite::FAILURE_COMPLETION}&reason=#{reason}")
 
-                connection.receive_data("GET /suites/#{suite_id} HTTP/1.1\r\nHost: _\r\n\r\n")
+                connection.receive_data("GET /suites/#{session_id} HTTP/1.1\r\nHost: _\r\n\r\n")
               end
             end
           end

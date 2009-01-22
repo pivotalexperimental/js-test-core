@@ -61,7 +61,7 @@ module JsTestCore
       context "when the Suite is not found" do
         it "raises a SuiteNotFound error" do
           mock_post_to_runner("*firefox")
-          mock(request).get("/suites/my_suite_id") do
+          mock(request).get("/suites/my_session_id") do
             stub(suite_response = Object.new).code {"404"}
             suite_response
           end
@@ -78,14 +78,14 @@ module JsTestCore
       end
 
       def mock_post_to_runner(selenium_browser_start_command)
-        mock(start_suite_response = Object.new).body {"suite_id=my_suite_id"}
+        mock(start_suite_response = Object.new).body {"session_id=my_session_id"}
         mock(request).post("/runners", "selenium_browser_start_command=#{CGI.escape(selenium_browser_start_command)}&selenium_host=localhost&selenium_port=4444") do
           start_suite_response
         end
       end
 
       def mock_polling_returns(suite_statuses=[])
-        mock(request).get("/suites/my_suite_id") do
+        mock(request).get("/suites/my_session_id") do
           stub(suite_response = Object.new).body {suite_statuses.shift}
           stub(suite_response).code {"200"}
           suite_response

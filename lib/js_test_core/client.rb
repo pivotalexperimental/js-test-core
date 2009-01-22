@@ -94,7 +94,7 @@ module JsTestCore
     end
 
     def poll
-      @last_poll = http.get("/suites/#{suite_id}")
+      @last_poll = http.get("/suites/#{session_id}")
       ensure_suite_exists!
       parts = parts_from_query(last_poll.body)
       @last_poll_status = parts['status']
@@ -103,12 +103,12 @@ module JsTestCore
 
     def ensure_suite_exists!
       if (400..499).include?(Integer(last_poll.code))
-        raise SuiteNotFound, "Could not find suite with id #{suite_id}"
+        raise SuiteNotFound, "Could not find suite with id #{session_id}"
       end
     end
 
-    def suite_id
-      @suite_id ||= parts_from_query(suite_start_response.body)['suite_id']
+    def session_id
+      @session_id ||= parts_from_query(suite_start_response.body)['session_id']
     end
   end
 end

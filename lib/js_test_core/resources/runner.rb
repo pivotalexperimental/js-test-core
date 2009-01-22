@@ -40,7 +40,7 @@ module JsTestCore
           runner = Runner.new(:driver => driver)
           Runner.register(runner)
           connection.send_head
-          connection.send_body("suite_id=#{runner.suite_id}")
+          connection.send_body("session_id=#{runner.session_id}")
         end
 
         protected
@@ -54,14 +54,14 @@ module JsTestCore
           instances[id.to_s]
         end
 
-        def finalize(suite_id, text)
-          if runner = find(suite_id)
+        def finalize(session_id, text)
+          if runner = find(session_id)
             runner.finalize(text)
           end
         end
 
         def register(runner)
-          instances[runner.suite_id] = runner
+          instances[runner.session_id] = runner
         end
 
         protected
@@ -97,7 +97,7 @@ module JsTestCore
         !running? && !successful?
       end
 
-      def suite_id
+      def session_id
         driver.session_id
       end
     end
