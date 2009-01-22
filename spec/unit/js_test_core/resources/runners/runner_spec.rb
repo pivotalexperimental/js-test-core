@@ -159,7 +159,7 @@ module JsTestCore
         end
 
         describe "when a spec_url is passed into the request" do
-          it "runs Selenium with the passed in host and part to run the specified spec suite in Firefox" do
+          it "runs Selenium with the passed in host and part to run the specified spec session in Firefox" do
             mock(Selenium::SeleniumDriver).new('localhost', 4444, selenium_browser_start_command, 'http://another-host:8080') do
               driver
             end
@@ -179,7 +179,7 @@ module JsTestCore
             end
           end
 
-          it "uses Selenium to run the entire spec suite in Firefox" do
+          it "uses Selenium to run the entire spec session in Firefox" do
             mock(driver).start
             mock(driver).open("http://0.0.0.0:8080/specs")
             mock(driver).session_id {session_id}.at_least(1)
@@ -252,10 +252,10 @@ module JsTestCore
           mock(driver).stop
         end
 
-        it "kills the browser and stores the #suite_run_result" do
-          suite_run_result = "The suite run result"
-          runner.finalize(suite_run_result)
-          runner.suite_run_result.should == suite_run_result
+        it "kills the browser and stores the #session_run_result" do
+          session_run_result = "The session run result"
+          runner.finalize(session_run_result)
+          runner.session_run_result.should == session_run_result
         end
 
         it "causes #running? to be false" do

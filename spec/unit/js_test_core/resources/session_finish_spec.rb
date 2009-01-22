@@ -2,18 +2,18 @@ require File.expand_path("#{File.dirname(__FILE__)}/../../unit_spec_helper")
 
 module JsTestCore
   module Resources
-    describe SuiteFinish do
+    describe SessionFinish do
       attr_reader :stdout
       before do
         @stdout = StringIO.new
-        SuiteFinish.const_set(:STDOUT, stdout)
+        SessionFinish.const_set(:STDOUT, stdout)
       end
 
       after do
-        SuiteFinish.__send__(:remove_const, :STDOUT)
+        SessionFinish.__send__(:remove_const, :STDOUT)
       end
 
-      describe "POST /suites/:session_id/finish" do
+      describe "POST /sessions/:session_id/finish" do
         context "when :session_id == 'user'" do
           it "writes the body of the request to stdout" do
             stub(connection).send_head
@@ -21,7 +21,7 @@ module JsTestCore
 
             text = "The text in the POST body"
             body = "text=#{text}"
-            connection.receive_data("POST /suites/user/finish HTTP/1.1\r\nHost: _\r\nContent-Length: #{body.length}\r\n\r\n#{body}")
+            connection.receive_data("POST /sessions/user/finish HTTP/1.1\r\nHost: _\r\nContent-Length: #{body.length}\r\n\r\n#{body}")
             stdout.string.should == "#{text}\n"
           end
 
@@ -31,7 +31,7 @@ module JsTestCore
 
             mock(connection).send_head
             mock(connection).send_body("")
-            connection.receive_data("POST /suites/user/finish HTTP/1.1\r\nHost: _\r\nContent-Length: #{body.length}\r\n\r\n#{body}")
+            connection.receive_data("POST /sessions/user/finish HTTP/1.1\r\nHost: _\r\nContent-Length: #{body.length}\r\n\r\n#{body}")
           end
         end
 
@@ -64,7 +64,7 @@ module JsTestCore
             mock(driver).stop
             stub(connection).close_connection
 
-            connection.receive_data("POST /suites/#{session_id}/finish HTTP/1.1\r\nHost: _\r\nContent-Length: #{body.length}\r\n\r\n#{body}")
+            connection.receive_data("POST /sessions/#{session_id}/finish HTTP/1.1\r\nHost: _\r\nContent-Length: #{body.length}\r\n\r\n#{body}")
           end
 
           it "responds with a blank body" do
@@ -73,7 +73,7 @@ module JsTestCore
 
             mock(connection).send_head
             mock(connection).send_body("")
-            connection.receive_data("POST /suites/#{session_id}/finish HTTP/1.1\r\nHost: _\r\nContent-Length: 0\r\n\r\n")
+            connection.receive_data("POST /sessions/#{session_id}/finish HTTP/1.1\r\nHost: _\r\nContent-Length: 0\r\n\r\n")
           end
         end
       end

@@ -2,8 +2,8 @@ require File.expand_path("#{File.dirname(__FILE__)}/../../unit_spec_helper")
 
 module JsTestCore
   module Resources
-    describe Suite do
-      describe "GET /suites/:session_id" do
+    describe Session do
+      describe "GET /sessions/:session_id" do
         attr_reader :driver, :session_id
 
         context "when there is no Runner with the :session_id" do
@@ -14,12 +14,12 @@ module JsTestCore
             mock(connection).send_head(404)
             mock(connection).send_body("")
 
-            connection.receive_data("GET /suites/#{session_id} HTTP/1.1\r\nHost: _\r\n\r\n")
+            connection.receive_data("GET /sessions/#{session_id} HTTP/1.1\r\nHost: _\r\n\r\n")
           end
         end
 
         context "when there is a Runner with the :session_id" do
-          attr_reader :suite_runner
+          attr_reader :session_runner
           before do
             @driver = "Selenium Driver"
             @session_id = "DEADBEEF"
@@ -33,49 +33,49 @@ module JsTestCore
             stub(connection_that_starts_firefox).send_head
             stub(connection_that_starts_firefox).send_body
             connection_that_starts_firefox.receive_data("POST /runners/firefox HTTP/1.1\r\nHost: _\r\nContent-Length: 0\r\n\r\n")
-            @suite_runner = Runner.find(session_id)
-            suite_runner.should be_running
+            @session_runner = Runner.find(session_id)
+            session_runner.should be_running
           end
 
           context "when a Runner with the :session_id is running" do
             it "responds with a 200 and status=running" do
               mock(connection).send_head
-              mock(connection).send_body("status=#{Resources::Suite::RUNNING}")
+              mock(connection).send_body("status=#{Resources::Session::RUNNING}")
 
-              connection.receive_data("GET /suites/#{session_id} HTTP/1.1\r\nHost: _\r\n\r\n")
+              connection.receive_data("GET /sessions/#{session_id} HTTP/1.1\r\nHost: _\r\n\r\n")
             end
           end
 
           context "when a Runner with the :session_id has completed" do
-            context "when the suite has a status of 'success'" do
+            context "when the session has a status of 'success'" do
               before do
                 stub(driver).stop
-                suite_runner.finalize("")
-                suite_runner.should be_successful
+                session_runner.finalize("")
+                session_runner.should be_successful
               end
 
               it "responds with a 200 and status=success" do
                 mock(connection).send_head
-                mock(connection).send_body("status=#{Resources::Suite::SUCCESSFUL_COMPLETION}")
+                mock(connection).send_body("status=#{Resources::Session::SUCCESSFUL_COMPLETION}")
 
-                connection.receive_data("GET /suites/#{session_id} HTTP/1.1\r\nHost: _\r\n\r\n")
+                connection.receive_data("GET /sessions/#{session_id} HTTP/1.1\r\nHost: _\r\n\r\n")
               end
             end
 
-            context "when the suite has a status of 'failure'" do
+            context "when the session has a status of 'failure'" do
               attr_reader :reason
               before do
                 stub(driver).stop
                 @reason = "Failure stuff"
-                suite_runner.finalize(reason)
-                suite_runner.should be_failed
+                session_runner.finalize(reason)
+                session_runner.should be_failed
               end
 
               it "responds with a 200 and status=failure and reason" do
                 mock(connection).send_head
-                mock(connection).send_body("status=#{Resources::Suite::FAILURE_COMPLETION}&reason=#{reason}")
+                mock(connection).send_body("status=#{Resources::Session::FAILURE_COMPLETION}&reason=#{reason}")
 
-                connection.receive_data("GET /suites/#{session_id} HTTP/1.1\r\nHost: _\r\n\r\n")
+                connection.receive_data("GET /sessions/#{session_id} HTTP/1.1\r\nHost: _\r\n\r\n")
               end
             end
           end
