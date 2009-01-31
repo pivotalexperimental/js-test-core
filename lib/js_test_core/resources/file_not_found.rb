@@ -4,7 +4,7 @@ module JsTestCore
       property :name
       def get
         connection.send_head(404)
-        connection.send_body("")
+        connection.send_body(Representations::FileNotFound.new(self, :path => rack_request.path_info).to_s)
       end
     end
   end

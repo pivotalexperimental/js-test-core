@@ -26,7 +26,7 @@ module JsTestCore
       describe "GET /javascripts/i_dont_exist - FileNotFound" do
         it "returns a 404 error" do
           mock(connection).send_head(404)
-          mock(connection).send_body("")
+          mock(connection).send_body(Regexp.new("File /javascripts/i_dont_exist not found"))
 
           connection.receive_data("GET /javascripts/i_dont_exist HTTP/1.1\r\nHost: _\r\n\r\n")
         end
