@@ -41,10 +41,11 @@ module JsTestCore
 
         it "returns an array of matching Files under this directory with the correct relative paths" do
           globbed_files = dir.glob("/**/*_spec.js")
-          globbed_files.size.should == 3
+          globbed_files.size.should == 4
           globbed_files.should contain_spec_file_with_correct_paths("/failing_spec.js")
           globbed_files.should contain_spec_file_with_correct_paths("/foo/failing_spec.js")
           globbed_files.should contain_spec_file_with_correct_paths("/foo/passing_spec.js")
+          globbed_files.should contain_spec_file_with_correct_paths("/custom_dir_and_suite/passing_spec.js")
         end
       end
     end

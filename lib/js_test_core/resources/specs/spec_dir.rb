@@ -3,9 +3,6 @@ module JsTestCore
     module Specs
       class SpecDirSuperclass < ::JsTestCore::Resources::Dir
         def get
-          puts "#{__FILE__}:#{__LINE__}"
-          puts "#{__FILE__}:#{__LINE__} #{absolute_path}"
-          puts "#{__FILE__}:#{__LINE__} #{::File.file?(absolute_path)}"
           if ::File.file?(absolute_path)
             super
           else
