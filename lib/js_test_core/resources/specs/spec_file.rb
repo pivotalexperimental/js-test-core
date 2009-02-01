@@ -3,12 +3,16 @@ module JsTestCore
     module Specs
       class SpecFileSuperclass < ::JsTestCore::Resources::File
         def get
-          raise NotImplementedError, "#{self.class}#get_default_generated_spec needs to be implemented"
+          if ::File.exists?(absolute_path) && ::File.extname(absolute_path) != ".js"
+            super
+          else
+            get_js
+          end
         end
 
         protected
-        def get_default_generated_spec
-          raise NotImplementedError, "#{self.class}#get_default_generated_spec needs to be implemented"
+        def get_js
+          raise NotImplementedError, "#{self.class}#get_js needs to be implemented"
         end
       end
 
