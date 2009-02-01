@@ -2,22 +2,13 @@ module JsTestCore
   module Resources
     module Specs
       class SpecDirSuperclass < ::JsTestCore::Resources::Dir
+        include Spec
+
         def get
           if ::File.file?(absolute_path)
             super
           else
-            connection.terminate_after_sending do
-              connection.send_head(
-                200,
-                'Content-Type' => "text/html",
-                'Last-Modified' => ::File.mtime(absolute_path).rfc822,
-                'Content-Length' => ::File.size(absolute_path)
-              )
-
-              connection.send_data(
-                JsTestCore::Representations::Spec.new(self, :spec_files => spec_files).to_s
-              )
-            end
+            get_generated_spec
           end
         end
       end
