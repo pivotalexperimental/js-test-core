@@ -1,2 +1,9 @@
 dir = File.dirname(__FILE__)
-require "#{dir}/representations/page.html"
+
+module JsTestCore
+  module Representations
+    include ThinRest::Representations
+  end
+end
+
+require "#{dir}/representations/spec.html"

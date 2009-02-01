@@ -69,33 +69,20 @@ module JsTestCore
           end
         end
 
-        describe "#get" do
-          attr_reader :request, :response
-          before do
-            @request = Rack::Request.new( Rack::MockRequest.env_for('/core') )
-            @response = Rack::Response.new
-          end
-
-          it "raises NotImplementedError" do
-            lambda do
-              dir.get
-            end.should raise_error(NotImplementedError)
-          end
-
-          it "can be overridden from a Module without needing to redefine the #get method" do
-            spec_dir_class = Resources::Specs::SpecDir.clone
-            mod = Module.new do
-              def get
-              end
+        describe "GET /specs/foo" do
+          it "renders a custom spec suite that includes all of the javascript spec files in the directory" do
+            WebRoot.dispatch_specs
+            Thin::Logging.silent = true
+            path = "#{spec_root_path}/foo"
+            mock(connection).send_head(200, 'Content-Type' => "text/html", 'Content-Length' => ::File.size(path), 'Last-Modified' => ::File.mtime(path).rfc822)
+            mock(connection).send_data(Regexp.new("Js Test Core Suite")) do |html|
+              doc = Nokogiri::HTML(html)
+              js_files = doc.search("script").map {|script| script["src"]}
+              js_files.should include("/specs/foo/passing_spec.js")
+              js_files.should include("/specs/foo/failing_spec.js")
             end
-            spec_dir_class.class_eval do
-              include mod
-            end
-            @dir = spec_dir_class.new(:connection => connection, :absolute_path => absolute_path, :relative_path => relative_path)
 
-            lambda do
-              dir.get
-            end.should_not raise_error
+            connection.receive_data("GET /specs/foo HTTP/1.1\r\nHost: _\r\n\r\n")
           end
         end
 

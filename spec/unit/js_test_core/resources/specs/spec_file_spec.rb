@@ -20,16 +20,18 @@ module JsTestCore
           end
 
           describe "GET /specs/foo/passing_spec" do
-            context "when #get_js is not overridden" do
-              it "renders an InternalServerError" do
-                Thin::Logging.silent = true
-                path = "#{spec_root_path}/foo/passing_spec.js"
-                mock(connection).send_head(500)
-                stub(connection).send_data
-                mock(connection).send_data(Regexp.new("#get_js needs to be implemented"))
-
-                connection.receive_data("GET /specs/foo/passing_spec HTTP/1.1\r\nHost: _\r\n\r\n")
+            it "renders a Representations::Spec with passing_spec.js as the spec file" do
+              Thin::Logging.silent = true
+              path = "#{spec_root_path}/foo/passing_spec.js"
+              mock(connection).send_head(200, 'Content-Type' => "text/html", 'Content-Length' => ::File.size(path), 'Last-Modified' => ::File.mtime(path).rfc822)
+              mock(connection).send_data(Regexp.new("Js Test Core Suite")) do |html|
+                doc = Nokogiri::HTML(html)
+                js_files = doc.search("script").map {|script| script["src"]}
+                js_files.should include("/specs/foo/passing_spec.js")
+                js_files.should_not include("/specs/foo/failing_spec.js")
               end
+
+              connection.receive_data("GET /specs/foo/passing_spec HTTP/1.1\r\nHost: _\r\n\r\n")
             end
           end
         end

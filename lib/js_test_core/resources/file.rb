@@ -1,6 +1,6 @@
 module JsTestCore
   module Resources
-    class File < Resources::Resource
+    class File < Resource
       MIME_TYPES = {
         '.html' => 'text/html',
         '.htm' => 'text/html',
@@ -31,11 +31,11 @@ module JsTestCore
             end
           end
         end
-
-        def ==(other)
-          return false unless other.class == self.class
-          absolute_path == other.absolute_path && relative_path == other.relative_path
-        end
+      end
+      
+      def ==(other)
+        return false unless other.class == self.class
+        absolute_path == other.absolute_path && relative_path == other.relative_path
       end
     end
   end

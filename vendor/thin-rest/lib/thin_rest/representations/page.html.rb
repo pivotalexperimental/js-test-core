@@ -23,8 +23,8 @@ module ThinRest
         "Thin Rest"
       end
 
-      def body_content(&block)
-        yield(self)
+      def body_content
+        yield if block_given?
       end
 
       def path

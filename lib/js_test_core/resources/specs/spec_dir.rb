@@ -6,13 +6,19 @@ module JsTestCore
           if ::File.file?(absolute_path)
             super
           else
-            get_dir
-          end
-        end
+            connection.terminate_after_sending do
+              connection.send_head(
+                200,
+                'Content-Type' => "text/html",
+                'Last-Modified' => ::File.mtime(absolute_path).rfc822,
+                'Content-Length' => ::File.size(absolute_path)
+              )
 
-        protected
-        def get_dir
-          raise NotImplementedError, "#{self.class}#get_dir needs to be implemented"
+              connection.send_data(
+                JsTestCore::Representations::Spec.new(self, :spec_files => spec_files).to_s
+              )
+            end
+          end
         end
       end
 

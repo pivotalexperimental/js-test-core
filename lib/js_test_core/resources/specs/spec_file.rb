@@ -6,13 +6,19 @@ module JsTestCore
           if ::File.exists?(absolute_path) && ::File.extname(absolute_path) != ".js"
             super
           else
-            get_js
-          end
-        end
+            connection.terminate_after_sending do
+              connection.send_head(
+                200,
+                'Content-Type' => "text/html",
+                'Last-Modified' => ::File.mtime(absolute_path).rfc822,
+                'Content-Length' => ::File.size(absolute_path)
+              )
 
-        protected
-        def get_js
-          raise NotImplementedError, "#{self.class}#get_js needs to be implemented"
+              connection.send_data(
+                JsTestCore::Representations::Spec.new(self, :spec_files => spec_files).to_s
+              )
+            end
+          end
         end
       end
 
