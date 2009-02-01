@@ -1,6 +1,6 @@
 module JsTestCore
   module Resources
-    class FileNotFound < ThinRest::Resource
+    class FileNotFound < ThinRest::Resources::Resource
       property :name
       def get
         connection.send_head(404)

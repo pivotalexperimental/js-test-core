@@ -1,7 +1,7 @@
 module JsTestCore
   module Resources
-    class Runner < ThinRest::Resource
-      class Collection < ThinRest::Resource
+    class Runner < ThinRest::Resources::Resource
+      class Collection < ThinRest::Resources::Resource
         property :selenium_browser_start_command
         route 'firefox' do |env, name|
           self.selenium_browser_start_command = "*firefox"

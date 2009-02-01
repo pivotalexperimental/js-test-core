@@ -1,6 +1,6 @@
 module JsTestCore
   module Resources
-    class WebRoot < ThinRest::Resource
+    class WebRoot < ThinRest::Resources::Resource
       route "" do |env, name|
         self
       end

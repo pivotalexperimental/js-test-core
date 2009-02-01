@@ -1,6 +1,6 @@
 module JsTestCore
   module Resources
-    class File < ThinRest::Resource
+    class File < ThinRest::Resources::Resource
       MIME_TYPES = {
         '.html' => 'text/html',
         '.htm' => 'text/html',
