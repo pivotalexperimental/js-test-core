@@ -59,7 +59,7 @@ class TestConnection < ThinRest::Connection
   end
 end
 
-class Root < ThinRest::Resources::Resources::Resource
+class Root < Resources::Resources::Resource
   property :connection
   route 'subresource', 'Subresource'
   route 'another_subresource', 'AnotherSubresource'
@@ -77,7 +77,7 @@ class Root < ThinRest::Resources::Resources::Resource
   end
 end
 
-class Subresource < ThinRest::Resources::Resources::Resource
+class Subresource < Resources::Resources::Resource
   def do_get
     "GET response"
   end
@@ -95,7 +95,7 @@ class Subresource < ThinRest::Resources::Resources::Resource
   end
 end
 
-class AnotherSubresource < ThinRest::Resources::Resources::Resource
+class AnotherSubresource < Resources::Resources::Resource
   def do_get
     "Another GET response"
   end
@@ -113,11 +113,11 @@ class AnotherSubresource < ThinRest::Resources::Resources::Resource
   end
 end
 
-class BlockSubresource < ThinRest::Resources::Resources::Resource
+class BlockSubresource < Resources::Resources::Resource
   property :foobar
 end
 
-class ErrorSubresource < ThinRest::Resources::Resources::Resource
+class ErrorSubresource < Resources::Resources::Resource
   ERROR_MESSAGE = "An Error"
 
   def get
@@ -125,7 +125,7 @@ class ErrorSubresource < ThinRest::Resources::Resources::Resource
   end
 end
 
-class WrongPropertySubresource < ThinRest::Resources::Resources::Resource
+class WrongPropertySubresource < Resources::Resources::Resource
   property :foobar
   def get
     "Wrong Property"

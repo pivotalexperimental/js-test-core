@@ -2,7 +2,7 @@ require File.expand_path("#{File.dirname(__FILE__)}/../../unit_spec_helper")
 
 module JsTestCore
   module Resources
-    describe FileNotFound do
+    describe Resources::ResourceNotFound do
       describe "GET /invalid_path" do
         it "returns a page with a of files in the directory" do
           mock(connection).send_head(404)

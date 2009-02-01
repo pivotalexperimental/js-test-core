@@ -23,7 +23,7 @@ module JsTestCore
         end
       end
 
-      describe "GET /javascripts/i_dont_exist - FileNotFound" do
+      describe "GET /javascripts/i_dont_exist - Resources::ResourceNotFound" do
         it "returns a 404 error" do
           mock(connection).send_head(404)
           mock(connection).send_body(Regexp.new("File /javascripts/i_dont_exist not found"))
