@@ -28,7 +28,7 @@ module JsTestCore
             :relative_path => "/specs"
           ))
         else
-          Resources::Resources::ResourceNotFound.new(env.merge(:name => name))
+          Resources::ResourceNotFound.new(env.merge(:name => name))
         end
       end
       route ANY do |env, name|

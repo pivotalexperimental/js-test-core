@@ -44,7 +44,7 @@ module ThinRest
 
         context "/no_handler_subresource - route is not defined" do
           it "returns a ResourceNotFound resource" do
-            root.locate("no_handler_subresource").class.should == Resources::ResourceNotFound
+            root.locate("no_handler_subresource").class.should == ResourceNotFound
           end
         end
 
