@@ -21,9 +21,9 @@ module JsTestCore
         connection.terminate_after_sending do
           connection.send_head(
             200,
-              'Content-Type' => content_type,
-              'Last-Modified' => ::File.mtime(absolute_path).rfc822,
-              'Content-Length' => ::File.size(absolute_path)
+            'Content-Type' => content_type,
+            'Last-Modified' => ::File.mtime(absolute_path).rfc822,
+            'Content-Length' => ::File.size(absolute_path)
           )
           ::File.open(absolute_path) do |file|
             while !file.eof?
