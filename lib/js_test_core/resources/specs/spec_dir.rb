@@ -3,7 +3,19 @@ module JsTestCore
     module Specs
       class SpecDirSuperclass < ::JsTestCore::Resources::Dir
         def get
-          raise NotImplementedError, "#{self.class}#get needs to be implemented"
+          puts "#{__FILE__}:#{__LINE__}"
+          puts "#{__FILE__}:#{__LINE__} #{absolute_path}"
+          puts "#{__FILE__}:#{__LINE__} #{::File.file?(absolute_path)}"
+          if ::File.file?(absolute_path)
+            super
+          else
+            get_dir
+          end
+        end
+
+        protected
+        def get_dir
+          raise NotImplementedError, "#{self.class}#get_dir needs to be implemented"
         end
       end
 

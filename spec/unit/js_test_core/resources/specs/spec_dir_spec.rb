@@ -58,6 +58,17 @@ module JsTestCore
           end
         end
 
+        describe "GET /specs/custom_dir_and_suite" do
+          it "renders the custom_dir_and_suite.html file" do
+            WebRoot.dispatch_specs
+            path = "#{spec_root_path}/custom_dir_and_suite.html"
+            mock(connection).send_head(200, 'Content-Type' => "text/html", 'Content-Length' => ::File.size(path), 'Last-Modified' => ::File.mtime(path).rfc822)
+            mock(connection).send_data(::File.read(path))
+
+            connection.receive_data("GET /specs/custom_dir_and_suite.html HTTP/1.1\r\nHost: _\r\n\r\n")
+          end
+        end
+
         describe "#get" do
           attr_reader :request, :response
           before do

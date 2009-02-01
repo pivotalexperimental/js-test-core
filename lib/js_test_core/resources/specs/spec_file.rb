@@ -3,6 +3,7 @@ module JsTestCore
     module Specs
       class SpecFileSuperclass < ::JsTestCore::Resources::File
         def get
+          puts "#{__FILE__}:#{__LINE__}"
           if ::File.exists?(absolute_path) && ::File.extname(absolute_path) != ".js"
             super
           else
