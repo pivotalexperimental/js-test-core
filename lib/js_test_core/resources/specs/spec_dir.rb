@@ -1,7 +1,7 @@
 module JsTestCore
   module Resources
     module Specs
-      class SpecDirSuperclass < ::JsTestCore::Resources::Dir
+      class SpecDir < ::JsTestCore::Resources::Dir
         include Spec
 
         def get
@@ -11,9 +11,7 @@ module JsTestCore
             get_generated_spec
           end
         end
-      end
-
-      class SpecDir < SpecDirSuperclass
+        
         def spec_files
           glob("/**/*_spec.js")
         end
