@@ -23,7 +23,7 @@ module JsTestCore
         end
 
         def render_spec
-          self.class.spec_representation_class.new(self, :spec_files => spec_files).to_s
+          Spec.spec_representation_class.new(self, :spec_files => spec_files).to_s
         end
       end
     end
