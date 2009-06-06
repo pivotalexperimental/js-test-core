@@ -48,17 +48,43 @@ module LuckyLuciano
             delete("/foobar").status.should == 404 unless verb == "delete"
           end
 
-          it "evaluates the block in as a Resource" do
-            evaluation_target = nil
-            ResourceFixture.send(verb, "/") do
-              evaluation_target = self
-              ""
-            end
-            app.register(ResourceFixture.route_handler)
+          describe "Instance behavior" do
+            attr_reader :evaluation_target
+            before do
+              evaluation_target = nil
+              ResourceFixture.send(verb, "/") do
+                evaluation_target = self
+                ""
+              end
+              app.register(ResourceFixture.route_handler)
 
-            send(verb, "/foobar")
-            evaluation_target.class.should == ResourceFixture
+              send(verb, "/foobar")
+              @evaluation_target = evaluation_target
+            end
+            
+            it "evaluates the block in as a Resource" do
+              evaluation_target.class.should == ResourceFixture
+            end
+
+            it "sets app to be the Sinatra context" do
+              evaluation_target.app.class.should == Sinatra::Application
+            end
+
+            it "delegates methods to the #app" do
+              return_value = nil
+              mock.proxy(evaluation_target.app).params {|val| return_value = val}
+              evaluation_target.params.should == return_value
+            end
+            
+            context "when the #app does not respond to the method" do
+              it "raises a NoMethodError from the Resource's perspective" do
+                lambda do
+                  evaluation_target.i_dont_exist
+                end.should raise_error(NoMethodError, /ResourceFixture/)
+              end
+            end
           end
+
         end
       end
 

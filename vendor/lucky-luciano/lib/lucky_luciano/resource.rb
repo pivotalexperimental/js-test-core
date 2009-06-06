@@ -55,7 +55,7 @@ module LuckyLuciano
               handlers.each do |handler|
                 verb, relative_path, opts, block = handler
                 app.send(verb, "#{resource_class.base_path}#{relative_path.gsub(/\/$/, "")}", opts) do
-                  resource_class.new(app).instance_eval(&block)
+                  resource_class.new(self).instance_eval(&block)
                 end
               end
             end
@@ -68,6 +68,14 @@ module LuckyLuciano
 
     def initialize(app)
       @app = app
+    end
+
+    def method_missing(method_name, *args, &block)
+      if app.respond_to?(method_name)
+        app.send(method_name, *args, &block)
+      else
+        super
+      end
     end
   end
 end
