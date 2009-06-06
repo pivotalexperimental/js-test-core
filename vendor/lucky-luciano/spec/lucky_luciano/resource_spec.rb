@@ -1,0 +1,110 @@
+require File.expand_path("#{File.dirname(__FILE__)}/../spec_helper")
+
+module LuckyLuciano
+  module ResourceSpec
+    class ResourceFixture < Resource
+      map "/foobar"
+    end
+
+    class ResourceFixtureWithSubPaths < Resource
+      map "/foobar"
+
+      get "/baz" do
+        "Response from /foobar/baz"
+      end
+
+      get "/users/:user_id" do
+        "User id is #{params[:user_id]}"
+      end
+    end
+
+    describe Resource do
+      include ResourceSpec
+
+      before do
+        ResourceFixture.recorded_http_handlers.clear
+      end
+
+      macro("http verb") do |verb|
+        describe ".#{verb}" do
+          it "creates a route to #{verb.upcase} the given path that executes the given block" do
+            ResourceFixture.send(verb, "/") do
+              "He sleeps with the fishes"
+            end
+            app.register(ResourceFixture.route_handler)
+            response = send(verb, "/foobar")
+            response.status.should == 200
+            response.body.should include("He sleeps with the fishes")
+          end
+
+          it "does not respond to another type of http request" do
+            ResourceFixture.send(verb, "/") do
+              ""
+            end
+            app.register(ResourceFixture.route_handler)
+            get("/foobar").status.should == 404 unless verb == "get"
+            put("/foobar").status.should == 404 unless verb == "put"
+            post("/foobar").status.should == 404 unless verb == "post"
+            delete("/foobar").status.should == 404 unless verb == "delete"
+          end
+
+          it "evaluates the block in as a Resource" do
+            evaluation_target = nil
+            ResourceFixture.send(verb, "/") do
+              evaluation_target = self
+              ""
+            end
+            app.register(ResourceFixture.route_handler)
+
+            send(verb, "/foobar")
+            evaluation_target.class.should == ResourceFixture
+          end
+        end
+      end
+
+      send("http verb", "get")
+      send("http verb", "put")
+      send("http verb", "post")
+      send("http verb", "delete")
+
+      describe ".path" do
+        context "when passed nothing" do
+          it "returns the base_path" do
+            ResourceFixture.path.should == "/foobar"
+          end
+        end
+        
+        context "when passed a sub path" do
+          it "merges the base_path into the sub path, regardless of a / in front" do
+            ResourceFixtureWithSubPaths.path("/baz").should == "/foobar/baz"
+            ResourceFixtureWithSubPaths.path("baz").should == "/foobar/baz"
+          end
+          
+          context "when passed a multiple sub paths" do
+            it "joins the sub paths with '/'" do
+              ResourceFixtureWithSubPaths.path("users", 99).should == "/foobar/users/99"
+            end
+          end
+
+          context "when passed a hash as the last argument" do
+            it "creates url params from the hash" do
+              path = ResourceFixtureWithSubPaths.path(
+                "users", 99, {:single_value_param => "single_value_param_value", 'multiple_value_param[]' => [1,2,3]}
+              )
+              uri = URI.parse(path)
+              uri.path.should == "/foobar/users/99"
+              query_parts = uri.query.split("&")
+              query_parts.should =~ [
+                "multiple_value_param[]=1",
+                "multiple_value_param[]=2",
+                "multiple_value_param[]=3",
+                "single_value_param=single_value_param_value",
+              ]
+            end
+          end
+        end
+      end
+    end
+  end
+  
+end
