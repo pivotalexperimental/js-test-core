@@ -51,7 +51,7 @@ module JsTestCore
       end
 
       def not_found
-        body = Representations::NotFound.new(:path_info => request.path_info).to_s        
+        body = Representations::NotFound.new(:message => "File #{path_info} not found").to_s
         [
           404,
           {

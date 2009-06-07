@@ -1,7 +1,7 @@
 module JsTestCore
   module Representations
     class NotFound < Page
-      needs :path_info
+      needs :message
       protected
       def body_content
         h1 message
@@ -9,10 +9,6 @@ module JsTestCore
 
       def title_text
         message
-      end
-
-      def message
-        "File #{path_info} not found"
       end
     end
   end
