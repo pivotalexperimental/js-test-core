@@ -59,24 +59,6 @@ module JsTestCore
       get("") do
         "<html><head></head><body>Welcome to the Js Test Server. Click the following link to run you <a href=/specs>spec suite</a>.</body></html>"
       end
-
-      #get("*") do
-      #  relative_path = params["splat"]
-      #  potential_file_in_public_path = "#{public_path}/#{relative_path}"
-      #  if ::File.directory?(potential_file_in_public_path)
-      #    Resources::Dir.new(env.merge(
-      #      :absolute_path => potential_file_in_public_path,
-      #      :relative_path => "/#{relative_path}"
-      #    ))
-      #  elsif ::File.exists?(potential_file_in_public_path)
-      #    Resources::File.new(env.merge(
-      #      :absolute_path => potential_file_in_public_path,
-      #      :relative_path => "/#{relative_path}"
-      #    ))
-      #  else
-      #    not_found
-      #  end
-      #end
     end
   end
 end
