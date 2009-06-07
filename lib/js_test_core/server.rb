@@ -3,13 +3,6 @@ module JsTestCore
     class << self
       attr_accessor :instance
 
-      def run(spec_root_path, implementation_root_path, public_path, server_options = {})
-        server_options[:Host] ||= DEFAULT_HOST
-        server_options[:Port] ||= DEFAULT_PORT
-        @instance = new(spec_root_path, implementation_root_path, public_path, server_options[:Host], server_options[:Port])
-        instance.run server_options
-      end
-
       def spec_root_path; instance.spec_root_path; end
       def implementation_root_path; instance.implementation_root_path; end
       def public_path; instance.public_path; end
