@@ -4,7 +4,6 @@ class Spec::ExampleGroup
   before(:all) do
     dir = File.dirname(__FILE__)
     @core_path = File.expand_path("#{LIBRARY_ROOT_DIR}/spec/example_core")
-    JsTestCore.core_path = core_path
     @spec_root_path = File.expand_path("#{LIBRARY_ROOT_DIR}/spec/example_specs")
     @implementation_root_path = File.expand_path("#{LIBRARY_ROOT_DIR}/spec/example_public/javascripts")
     @public_path = File.expand_path("#{LIBRARY_ROOT_DIR}/spec/example_public")
@@ -12,10 +11,11 @@ class Spec::ExampleGroup
   end
 
   before(:each) do
-    JsTestCore::Server.instance = JsTestCore::Server.new(
+    JsTestCore::Configuration.instance = JsTestCore::Configuration.new(
       :spec_root_path => spec_root_path,
       :implementation_root_path => implementation_root_path,
-      :public_path => public_path
+      :public_path => public_path,
+      :core_path => core_path
     )
   end
 

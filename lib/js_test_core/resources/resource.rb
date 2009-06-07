@@ -10,7 +10,7 @@ module JsTestCore
       def root_url; server.root_url; end
 
       def server
-        JsTestCore::Server
+        JsTestCore::Configuration
       end
     end
   end

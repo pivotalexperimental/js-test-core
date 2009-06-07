@@ -15,6 +15,8 @@ require "selenium/client"
 require "optparse"
 require "erector"
 
+require "#{dir}/js_test_core/configuration"
+
 require "#{dir}/js_test_core/extensions"
 require "#{dir}/js_test_core/resources"
 require "#{dir}/js_test_core/representations"
@@ -22,7 +24,6 @@ require "#{dir}/js_test_core/selenium"
 
 require "#{dir}/js_test_core/client"
 require "#{dir}/js_test_core/selenium_server_configuration"
-require "#{dir}/js_test_core/server"
 
 require "#{dir}/js_test_core/app"
 
@@ -31,6 +32,14 @@ module JsTestCore
   DEFAULT_PORT = 8080
 
   class << self
-    attr_accessor :core_path
+    Configuration.instance = Configuration.new
+
+    def method_missing(method_name, *args, &block)
+      if Configuration.instance.respond_to?(method_name)
+        Configuration.instance.send(method_name, *args, &block)
+      else
+        super
+      end
+    end
   end
 end

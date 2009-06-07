@@ -94,7 +94,7 @@ module JsTestCore
       end
 
       def full_spec_suite_url
-        "#{Server.root_url}/specs"
+        "#{Configuration.root_url}/specs"
       end
     end
   end

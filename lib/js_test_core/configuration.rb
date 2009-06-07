@@ -1,16 +1,18 @@
 module JsTestCore
-  class Server
+  class Configuration
     class << self
       attr_accessor :instance
 
-      def spec_root_path; instance.spec_root_path; end
-      def implementation_root_path; instance.implementation_root_path; end
-      def public_path; instance.public_path; end
-      def core_path; instance.core_path; end
-      def root_url; instance.root_url; end
+      def method_missing(method_name, *args, &block)
+        if Configuration.instance.respond_to?(method_name)
+          Configuration.instance.send(method_name, *args, &block)
+        else
+          super
+        end
+      end
     end
 
-    attr_accessor :host, :port, :spec_root_path, :implementation_root_path, :public_path
+    attr_accessor :host, :port, :spec_root_path, :implementation_root_path, :public_path, :core_path
 
     def initialize(params={})
       params = {
@@ -25,14 +27,11 @@ module JsTestCore
       @public_path = ::File.expand_path(params[:public_path])
       @host = params[:host]
       @port = params[:port]
+      @core_path = params[:core_path]
     end
 
     def root_url
       "http://#{host}:#{port}"
-    end
-
-    def core_path
-      JsTestCore.core_path
     end
   end
 end
