@@ -14,11 +14,7 @@ module JsTestCore
         '.gif' => 'image/gif',
         }
 
-      attr_reader :relative_path, :absolute_path
-
       get "*" do
-        process_path
-
         if ::File.exists?(absolute_path)
           extension = ::File.extname(absolute_path)
           content_type = MIME_TYPES[extension] || 'text/html'
@@ -36,17 +32,15 @@ module JsTestCore
         end
       end
       
-      def ==(other)
-        return false unless other.class == self.class
-        absolute_path == other.absolute_path && relative_path == other.relative_path
+      def relative_path
+        @relative_path ||= params["splat"]
+      end
+
+      def absolute_path
+        @absolute_path ||= ::File.expand_path("#{public_path}#{relative_path.join("/")}")
       end
 
       protected
-
-      def process_path
-        @relative_path = params["splat"]
-        @absolute_path = ::File.expand_path("#{public_path}#{relative_path.join("/")}")
-      end
 
       def not_found
         body = Representations::NotFound.new(:path_info => request.path_info).to_s        
