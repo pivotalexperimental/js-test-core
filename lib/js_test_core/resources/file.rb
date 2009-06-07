@@ -30,10 +30,18 @@ module JsTestCore
 
       def do_get
         if ::File.exists?(absolute_path)
-          render_file
+          if ::File.directory?(absolute_path)
+            render_dir
+          else
+            render_file
+          end
         else
           pass
         end
+      end
+
+      def render_dir
+        Representations::Dir.new(:relative_path => relative_path, :absolute_path => absolute_path).to_s
       end
 
       def render_file
