@@ -1,14 +1,5 @@
 class Spec::ExampleGroup
   include Rack::Test::Methods
-  class << self
-    def thin_logging
-      @thin_logging = true if @thin_logging.nil?
-      @thin_logging
-    end
-
-    attr_writer :thin_logging
-  end
-
   attr_reader :core_path, :spec_root_path, :implementation_root_path, :public_path, :server, :connection
   before(:all) do
     dir = File.dirname(__FILE__)
@@ -34,11 +25,6 @@ class Spec::ExampleGroup
 
   def app
     Sinatra::Application
-  end
-
-  def spec_dir(relative_path="")
-    absolute_path = spec_root_path + relative_path
-    JsTestCore::Resources::Specs::SpecDir.new(:connection => connection, :absolute_path => absolute_path, :relative_path => "/specs#{relative_path}")
   end
 
   def be_http(status, headers, body)
