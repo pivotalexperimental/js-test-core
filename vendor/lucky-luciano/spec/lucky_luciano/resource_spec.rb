@@ -18,6 +18,14 @@ module LuckyLuciano
       end
     end
 
+    class User < Resource
+      map "/users/:user_id"
+
+      get "/friends" do
+        "User #{params['user_id']} friends"
+      end
+    end
+
     describe Resource do
       include ResourceSpec
 
@@ -129,8 +137,27 @@ module LuckyLuciano
             end
           end
         end
+        
+        context "when the base_path contains a parameter" do
+          context "when not passed" do
+            it "raises an ArgumentError" do
+              lambda do
+                User.path
+              end.should raise_error(
+                ArgumentError,
+                %r{Expected :user_id to have a value}
+              )
+            end
+          end
+
+          context "when first argument is a hash" do
+            it "returns the full path with the base path param value" do
+              User.path("friends", :user_id => 99).should == "/users/99/friends"
+            end
+          end
+        end
       end
     end
   end
-  
+
 end

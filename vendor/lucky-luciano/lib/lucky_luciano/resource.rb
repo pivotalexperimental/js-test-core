@@ -1,21 +1,16 @@
 module LuckyLuciano
   class Resource
     class << self
-      attr_reader :base_path
+      attr_reader :base_path_definition, :base_path_param_keys
 
-      def path(*sub_paths)
-        params = sub_paths.last.is_a?(Hash) ? sub_paths.pop : nil
-        full_path = "#{base_path}/#{sub_paths.join("/")}".gsub("//", "/").gsub(/\/$/, "")
-        if params
-          query = build_query(params)
-          "#{full_path(*sub_paths)}?#{query}"
-        else
-          full_path(*sub_paths)
+      def map(base_path_definition)
+        @base_path_definition = base_path_definition
+        @base_path_param_keys = base_path_definition.split("/").find_all do |segment|
+          segment_param_key(segment)
+        end.map do |param|
+          param[1..-1].to_sym
         end
-      end
-
-      def map(base_path)
-        self.base_path = base_path
+        @base_path_definition
       end
 
       def recorded_http_handlers
@@ -34,12 +29,47 @@ module LuckyLuciano
         RUBY
       end
 
-      def full_path(*sub_paths)
-        "#{base_path}/#{sub_paths.join("/")}".gsub("//", "/").gsub(/\/$/, "")
+      def path(*sub_paths)
+        params = sub_paths.last.is_a?(Hash) ? sub_paths.pop : {}
+
+        full_path = "#{base_path(params)}/#{sub_paths.join("/")}".gsub("//", "/").gsub(/\/$/, "")
+
+        query_params = params.delete_if do |key, value|
+          base_path_param_keys.include?(key)
+        end
+
+        if query_params.empty?
+          full_path
+        else
+          query = build_query(query_params)
+          "#{full_path}?#{query}"
+        end
       end
-      
+
+      def base_path(params={})
+        base_path = if base_path_param_keys.empty?
+          base_path_definition.dup
+        else
+          base_path_param_keys.each do |base_path_param|
+            unless params.include?(base_path_param.to_sym)
+              raise ArgumentError, "Expected #{base_path_param.inspect} to have a value"
+            end
+          end
+          base_path_definition.split("/").map do |segment|
+            if param_key = segment_param_key(segment)
+              params[param_key]
+            else
+              segment
+            end
+          end.join("/")
+        end
+      end
+
       protected
-      attr_writer :base_path
+
+      def segment_param_key(segment)
+        segment[0..0] == ':' ? segment[1..-1].to_sym : nil
+      end
 
       def build_query(params)
         params.to_a.inject([]) do |splatted_params, (key, value)|
@@ -58,7 +88,7 @@ module LuckyLuciano
             define_method(:registered) do |app|
               handlers.each do |handler|
                 verb, relative_path, opts, block = handler
-                app.send(verb, "#{resource_class.base_path}#{relative_path.gsub(/\/$/, "")}", opts) do
+                app.send(verb, "#{resource_class.base_path_definition}#{relative_path.gsub(/\/$/, "")}", opts) do
                   resource_class.new(self).instance_eval(&block)
                 end
               end
