@@ -6,6 +6,11 @@ module JsTestCore
       describe "GET /" do
         it "includes a link to the spec suite" do
           response = get("/")
+          response.should be_http(
+            200,
+            {},
+            ""
+          )
           doc = Nokogiri::HTML(response.body)
           doc.css("a[href='/specs']").should_not be_nil
         end

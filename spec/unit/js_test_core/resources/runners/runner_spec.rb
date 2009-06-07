@@ -84,10 +84,12 @@ module JsTestCore
         it "responds with a 200 and the session_id" do
           Runner.find(session_id).should be_nil
           response = post(Runner.path("/"), {:selenium_browser_start_command => selenium_browser_start_command})
-
-          response.body.should == "session_id=#{session_id}"
-          response.status.should == 200
-          response.headers["Content-Length"].should == response.body.length.to_s
+          body = "session_id=#{session_id}"
+          response.should be_http(
+            200,
+            {'Content-Length' => body.length.to_s},
+            body
+          )
         end
 
         it "starts the Selenium Driver, creates a SessionID cookie, and opens the spec page" do
@@ -197,9 +199,12 @@ module JsTestCore
         it "creates a Runner whose #driver started with '*firefox'" do
           Runner.find(session_id).should be_nil
           response = post(Runner.path("/firefox"))
-
-          response.body.should == "session_id=#{session_id}"
-          response.headers["Content-Length"].should == response.body.length.to_s
+          body = "session_id=#{session_id}"
+          response.should be_http(
+            200,
+            {'Content-Length' => body.length.to_s},
+            body
+          )
 
           runner = Runner.find(session_id)
           runner.class.should == Runner
@@ -213,9 +218,12 @@ module JsTestCore
         it "creates a Runner whose #driver started with '*iexplore'" do
           Runner.find(session_id).should be_nil
           response = post(Runner.path("/iexplore"))
-
-          response.body.should == "session_id=#{session_id}"
-          response.headers["Content-Length"].should == response.body.length.to_s
+          body = "session_id=#{session_id}"
+          response.should be_http(
+            200,
+            {'Content-Length' => body.length.to_s},
+            body
+          )
 
           runner = Runner.find(session_id)
           runner.class.should == Runner
@@ -228,7 +236,11 @@ module JsTestCore
         context "when the driver#session_started? is true" do
           it "returns true" do
             response = post(Runner.path("/"), {:selenium_browser_start_command => selenium_browser_start_command})
-            response.status.should == 200
+            response.should be_http(
+              200,
+              {},
+              ""
+            )
 
             runner = Resources::Runner.find(session_id)
             runner.driver.session_started?.should be_true
@@ -239,7 +251,11 @@ module JsTestCore
         context "when the driver#session_started? is false" do
           it "returns false" do
             response = post(Runner.path("/"), {:selenium_browser_start_command => selenium_browser_start_command})
-            response.status.should == 200
+            response.should be_http(
+              200,
+              {},
+              ""
+            )
 
             runner = Resources::Runner.find(session_id)
             runner.driver.stop

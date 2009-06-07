@@ -16,10 +16,14 @@ module JsTestCore
             path = "#{spec_root_path}/foo"
 
             response = get(SpecDir.path("foo"))
-            response.status.should == 200
-            response.headers["Content-Type"].should == "text/html"
-            response.headers["Last-Modified"].should == ::File.mtime(path).rfc822
-
+            response.should be_http(
+              200,
+              {
+                "Content-Type" => "text/html",
+                "Last-Modified" => ::File.mtime(path).rfc822
+              },
+              ""
+            )
             doc = Nokogiri::HTML(response.body)
             js_files = doc.search("script").map {|script| script["src"]}
             js_files.should include("/specs/foo/passing_spec.js")

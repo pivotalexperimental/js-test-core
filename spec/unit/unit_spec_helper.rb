@@ -126,7 +126,7 @@ class Spec::ExampleGroup
       unless headers.all?{|k, v| given.headers[k] == headers[k]}
         passed = false
       end
-      unless given.body.include?(body)
+      unless body.is_a?(Regexp) ? given.body =~ body : given.body.include?(body)
         passed = false
       end
       passed
