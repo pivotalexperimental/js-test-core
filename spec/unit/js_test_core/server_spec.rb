@@ -6,10 +6,6 @@ module JsTestCore
     
     before do
       @result = ""
-      stub(EventMachine).send_data do |signature, data, data_length|
-        @result << data
-      end
-      stub(EventMachine).close_connection
     end
 
     describe ".run" do
