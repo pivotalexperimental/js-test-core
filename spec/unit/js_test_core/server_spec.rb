@@ -39,43 +39,6 @@ module JsTestCore
       end
     end
 
-    describe "#call" do
-      describe "when there is an error" do
-        attr_reader :top_line_of_backtrace
-        before do
-          @top_line_of_backtrace = __LINE__ + 2
-          stub.instance_of(Resources::WebRoot).locate('somedir') do
-            raise "Foobar"
-          end
-        end
-
-        it "shows the full request path in the error message" do
-          error = nil
-          mock(connection).log_error(is_a(Exception)) do |error_arg|
-            error = error_arg
-          end
-          
-          get('/somedir')
-          error.message.should =~ Regexp.new("/somedir")
-        end
-
-        it "uses the backtrace from where the original error was raised" do
-          error = nil
-          mock(connection).log_error(is_a(Exception)) do |error_arg|
-            error = error_arg
-          end
-
-          get('/somedir')
-          no_error = false
-          top_of_backtrace = error.backtrace.first.split(":")
-          backtrace_file = ::File.expand_path(top_of_backtrace[0])
-          backtrace_line = Integer(top_of_backtrace[1])
-          backtrace_file.should == __FILE__
-          backtrace_line.should == top_line_of_backtrace
-        end
-      end
-    end
-
     describe "#root_url" do
       it "returns the url of the site's root" do
         server.root_url.should == "http://#{server.host}:#{server.port}"
