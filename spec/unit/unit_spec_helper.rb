@@ -57,6 +57,8 @@ end
 Sinatra::Application.use ShowTestExceptions
 Sinatra::Application.set :raise_errors, true
 Sinatra::Application.register(JsTestCore::Resources::WebRoot.route_handler)
+Sinatra::Application.register(JsTestCore::Resources::Specs::SpecDir.route_handler)
+Sinatra::Application.register(JsTestCore::Resources::Specs::SpecFile.route_handler)
 Sinatra::Application.register(JsTestCore::Resources::Dir.route_handler)
 Sinatra::Application.register(JsTestCore::Resources::File.route_handler)
 
