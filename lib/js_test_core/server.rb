@@ -19,13 +19,19 @@ module JsTestCore
 
     attr_accessor :host, :port, :spec_root_path, :implementation_root_path, :public_path
 
-    def initialize(spec_root_path, implementation_root_path, public_path, host=DEFAULT_HOST, port=DEFAULT_PORT)
-      dir = ::File.dirname(__FILE__)
-      @spec_root_path = ::File.expand_path(spec_root_path)
-      @implementation_root_path = ::File.expand_path(implementation_root_path)
-      @public_path = ::File.expand_path(public_path)
-      @host = host
-      @port = port
+    def initialize(params={})
+      params = {
+        :spec_root_path => File.expand_path("./specs/javascripts"),
+        :implementation_root_path => File.expand_path("./public/javascripts"),
+        :public_path => File.expand_path("./public"),
+        :host => DEFAULT_HOST,
+        :port => DEFAULT_PORT,
+      }.merge(params)
+      @spec_root_path = ::File.expand_path(params[:spec_root_path])
+      @implementation_root_path = ::File.expand_path(params[:implementation_root_path])
+      @public_path = ::File.expand_path(params[:public_path])
+      @host = params[:host]
+      @port = params[:port]
     end
 
     def root_url

@@ -41,7 +41,10 @@ module JsTestCore
 
     describe "#root_url" do
       it "returns the url of the site's root" do
-        Server.root_url.should == "http://#{server.host}:#{server.port}"
+        server = Server.new
+        server.host = "localhost"
+        server.port = 9999
+        server.root_url.should == "http://localhost:9999"
       end
     end
   end

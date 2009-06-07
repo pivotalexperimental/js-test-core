@@ -21,7 +21,11 @@ class Spec::ExampleGroup
   end
 
   before(:each) do
-    JsTestCore::Server.instance = JsTestCore::Server.new(spec_root_path, implementation_root_path, public_path)
+    JsTestCore::Server.instance = JsTestCore::Server.new(
+      :spec_root_path => spec_root_path,
+      :implementation_root_path => implementation_root_path,
+      :public_path => public_path
+    )
   end
 
   after(:each) do
