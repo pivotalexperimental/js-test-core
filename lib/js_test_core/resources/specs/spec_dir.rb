@@ -16,14 +16,14 @@ module JsTestCore
           glob("/**/*_spec.js")
         end
 
-        route ANY do |env, name|
-          if result = (file(name) || subdir(name) || spec_file(name))
-            result
-          else
-            base_path = "#{relative_path}/#{name}"
-            raise "No file or directory found at #{base_path} or spec found at #{base_path}.js."
-          end
-        end
+        #route ANY do |env, name|
+        #  if result = (file(name) || subdir(name) || spec_file(name))
+        #    result
+        #  else
+        #    base_path = "#{relative_path}/#{name}"
+        #    raise "No file or directory found at #{base_path} or spec found at #{base_path}.js."
+        #  end
+        #end
 
         protected
 

@@ -1,6 +1,8 @@
 require "rubygems"
 require "spec"
 require "spec/autorun"
+require "rack/test"
+ARGV.push("-b")
 
 dir = File.dirname(__FILE__)
 $LOAD_PATH.unshift File.expand_path("#{dir}/../../lib")
@@ -29,7 +31,37 @@ class JsTestCoreTestDir < JsTestCore::Resources::Dir
   end
 end
 
+class ShowTestExceptions
+  attr_reader :app
+
+  def initialize(app)
+    @app = app
+  end
+
+  def call(env)
+    app.call(env)
+  rescue StandardError, LoadError, SyntaxError => e
+    body = [
+        e.message,
+        e.backtrace.join("\n\t")
+      ].join("\n")
+    [
+      500,
+      {"Content-Type" => "text",
+       "Content-Length" => body.size.to_s},
+      body
+    ]
+  end
+end
+
+Sinatra::Application.use ShowTestExceptions
+Sinatra::Application.set :raise_errors, true
+Sinatra::Application.register(JsTestCore::Resources::WebRoot.route_handler)
+Sinatra::Application.register(JsTestCore::Resources::Dir.route_handler)
+Sinatra::Application.register(JsTestCore::Resources::File.route_handler)
+
 class Spec::ExampleGroup
+  include Rack::Test::Methods
   class << self
     def thin_logging
       @thin_logging = true if @thin_logging.nil?
@@ -52,47 +84,31 @@ class Spec::ExampleGroup
 
   before(:each) do
     JsTestCore::Server.instance = JsTestCore::Server.new(spec_root_path, implementation_root_path, public_path)
-    stub(EventMachine).run do
-      raise "You need to mock calls to EventMachine.run or the process will hang"
-    end
-    stub(EventMachine).start_server do
-      raise "You need to mock calls to EventMachine.start_server or the process will hang"
-    end
-    stub(EventMachine).send_data do
-      raise "Calls to EventMachine.send_data must be mocked or stubbed"
-    end
-    @connection = create_connection
-    stub(EventMachine).send_data {raise "EventMachine.send_data must be handled"}
-    stub(EventMachine).close_connection {raise "EventMachine.close_connection must be handled"}
-    @server = JsTestCore::Server.instance
-    Thin::Logging.silent = !self.class.thin_logging
-    Thin::Logging.debug = self.class.thin_logging
+    #stub(EventMachine).run do
+    #  raise "You need to mock calls to EventMachine.run or the process will hang"
+    #end
+    #stub(EventMachine).start_server do
+    #  raise "You need to mock calls to EventMachine.start_server or the process will hang"
+    #end
+    #stub(EventMachine).send_data do
+    #  raise "Calls to EventMachine.send_data must be mocked or stubbed"
+    #end
+    #@connection = create_connection
+    #stub(EventMachine).send_data {raise "EventMachine.send_data must be handled"}
+    #stub(EventMachine).close_connection {raise "EventMachine.close_connection must be handled"}
+    #@server = JsTestCore::Server.instance
+    #Thin::Logging.silent = !self.class.thin_logging
+    #Thin::Logging.debug = self.class.thin_logging
   end
 
   after(:each) do
     JsTestCore::Resources::WebRoot.dispatch_strategy = nil
-    Thin::Logging.silent = true
-    Thin::Logging.debug = false
+    #Thin::Logging.silent = true
+    #Thin::Logging.debug = false
   end
 
-  def create_connection(guid=Guid.new)
-    Thin::JsTestCoreConnection.new(Guid.new)
-  end
-
-  def get(url, params={})
-    request(:get, url, params)
-  end
-
-  def post(url, params={})
-    request(:post, url, params)
-  end
-
-  def put(url, params={})
-    request(:put, url, params)
-  end
-
-  def delete(url, params={})
-    request(:delete, url, params)
+  def app
+    Sinatra::Application
   end
 
   def env_for(method, url, params)

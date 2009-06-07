@@ -19,7 +19,7 @@ module JsTestCore
       def root_url; instance.root_url; end
     end
 
-    attr_reader :host, :port, :spec_root_path, :implementation_root_path, :public_path
+    attr_accessor :host, :port, :spec_root_path, :implementation_root_path, :public_path
 
     def initialize(spec_root_path, implementation_root_path, public_path, host=DEFAULT_HOST, port=DEFAULT_PORT)
       dir = ::File.dirname(__FILE__)

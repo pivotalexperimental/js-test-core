@@ -1,23 +1,20 @@
 module JsTestCore
   module Resources
-    class Runner < Resources::Resource
+    class Runner < Resource
       class Collection < Resources::Resource
-        property :selenium_browser_start_command
-        route 'firefox' do |env, name|
-          self.selenium_browser_start_command = "*firefox"
-          self
-        end
-        route 'iexplore' do |env, name|
-          self.selenium_browser_start_command = "*iexplore"
-          self
+        attr_reader :selenium_browser_start_command
+
+        post "/firefox" do
+          @selenium_browser_start_command = "*firefox"
+          do_post
         end
 
-        def after_initialize
-          super
-          self.selenium_browser_start_command = rack_request['selenium_browser_start_command']
+        post '/iexplore' do |env, name|
+          @selenium_browser_start_command = "*iexplore"
+          do_post
         end
 
-        def post
+        def do_post
           spec_url = rack_request['spec_url'].to_s == "" ? full_spec_suite_url : rack_request['spec_url']
           parsed_spec_url = URI.parse(spec_url)
           selenium_host = rack_request['selenium_host'].to_s == "" ? 'localhost' : rack_request['selenium_host'].to_s
@@ -73,7 +70,7 @@ module JsTestCore
       end
 
       include FileUtils
-      property :driver
+      attr_reader :driver
       attr_reader :profile_dir, :session_run_result
 
       def after_initialize

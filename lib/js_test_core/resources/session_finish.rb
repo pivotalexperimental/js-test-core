@@ -1,7 +1,7 @@
 module JsTestCore
   module Resources
     class SessionFinish < Resources::Resource
-      property :session
+      attr_reader :session
       
       def post
         if session.associated_with_a_runner?

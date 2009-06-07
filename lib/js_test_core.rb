@@ -3,12 +3,8 @@ gem "thin", ">=0.8.0"
 gem "selenium-client"
 
 dir = File.dirname(__FILE__)
-$LOAD_PATH.unshift File.expand_path("#{dir}/../vendor/thin-rest/lib")
-require "thin_rest"
-
-# This causes errors to be printed to STDOUT.
-Thin::Logging.silent = false
-Thin::Logging.debug = true
+$LOAD_PATH.unshift File.expand_path("#{dir}/../vendor/lucky-luciano/lib")
+require "lucky_luciano"
 
 require "fileutils"
 require "tmpdir"

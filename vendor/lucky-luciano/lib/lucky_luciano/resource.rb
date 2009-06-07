@@ -8,9 +8,9 @@ module LuckyLuciano
         full_path = "#{base_path}/#{sub_paths.join("/")}".gsub("//", "/").gsub(/\/$/, "")
         if params
           query = build_query(params)
-          "#{full_path}?#{query}"
+          "#{full_path(*sub_paths)}?#{query}"
         else
-          full_path
+          full_path(*sub_paths)
         end
       end
 
@@ -32,6 +32,10 @@ module LuckyLuciano
           recorded_http_handlers << [:#{http_verb}, relative_path, opts, block]
         end
         RUBY
+      end
+
+      def full_path(*sub_paths)
+        "#{base_path}/#{sub_paths.join("/")}".gsub("//", "/").gsub(/\/$/, "")
       end
       
       protected
