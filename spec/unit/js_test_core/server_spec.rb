@@ -8,34 +8,6 @@ module JsTestCore
       @result = ""
     end
 
-    describe ".run" do
-      attr_reader :server_instance
-      before do
-        @server_instance = Server.instance
-        Server.instance = nil
-      end
-
-      it "instantiates an instance of Server and starts a Rack Thin handler" do
-        host = DEFAULT_HOST
-        port = DEFAULT_PORT
-
-        mock(EventMachine).run.yields
-        mock(EventMachine).start_server(host, port, ::Thin::JsTestCoreConnection)
-
-        Server.run(spec_root_path, implementation_root_path, public_path)
-      end
-
-      it "when passed a custom host and port, sets the host and port to the passed in value" do
-        host = 'foobar.com'
-        port = 80
-
-        mock(EventMachine).run.yields
-        mock(EventMachine).start_server(host, port, ::Thin::JsTestCoreConnection)
-
-        Server.run(spec_root_path, implementation_root_path, public_path, {:Host => host, :Port => port})
-      end
-    end
-
     describe ".spec_root" do
       it "returns the Dir " do
         Server.spec_root_path.should == spec_root_path

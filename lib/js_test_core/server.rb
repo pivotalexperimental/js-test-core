@@ -28,15 +28,6 @@ module JsTestCore
       @port = port
     end
 
-    def run(options)
-      server = ::Thin::Server.new(options[:Host], options[:Port]) do
-        use Rack::CommonLogger
-      end
-      server.backend = ::Thin::Backends::JsTestCoreServer.new(options[:Host], options[:Port])
-      server.backend.server = server
-      server.start!
-    end
-
     def root_url
       "http://#{host}:#{port}"
     end
