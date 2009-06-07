@@ -58,6 +58,7 @@ Sinatra::Application.use ShowTestExceptions
 Sinatra::Application.set :raise_errors, true
 Sinatra::Application.register(JsTestCore::Resources::WebRoot.route_handler)
 Sinatra::Application.register(JsTestCore::Resources::Runner.route_handler)
+Sinatra::Application.register(JsTestCore::Resources::Session.route_handler)
 Sinatra::Application.register(JsTestCore::Resources::Specs::SpecDir.route_handler)
 Sinatra::Application.register(JsTestCore::Resources::Specs::SpecFile.route_handler)
 Sinatra::Application.register(JsTestCore::Resources::Dir.route_handler)
@@ -87,67 +88,48 @@ class Spec::ExampleGroup
 
   before(:each) do
     JsTestCore::Server.instance = JsTestCore::Server.new(spec_root_path, implementation_root_path, public_path)
-    #stub(EventMachine).run do
-    #  raise "You need to mock calls to EventMachine.run or the process will hang"
-    #end
-    #stub(EventMachine).start_server do
-    #  raise "You need to mock calls to EventMachine.start_server or the process will hang"
-    #end
-    #stub(EventMachine).send_data do
-    #  raise "Calls to EventMachine.send_data must be mocked or stubbed"
-    #end
-    #@connection = create_connection
-    #stub(EventMachine).send_data {raise "EventMachine.send_data must be handled"}
-    #stub(EventMachine).close_connection {raise "EventMachine.close_connection must be handled"}
-    #@server = JsTestCore::Server.instance
-    #Thin::Logging.silent = !self.class.thin_logging
-    #Thin::Logging.debug = self.class.thin_logging
   end
 
   after(:each) do
     JsTestCore::Resources::WebRoot.dispatch_strategy = nil
-    #Thin::Logging.silent = true
-    #Thin::Logging.debug = false
   end
 
   def app
     Sinatra::Application
   end
 
-  def env_for(method, url, params)
-    Rack::MockRequest.env_for(url, params.merge({:method => method.to_s.upcase, 'js_test_core.connection' => connection}))
-  end
-
-  def create_request(method, path, params={})
-    body = params.map do |key, value|
-      "#{URI.escape(key)}=#{URI.escape(value)}"
-    end.join("&")
-    connection.receive_data "#{method.to_s.upcase} #{path} HTTP/1.1\r\nHost: _\r\nContent-Length: #{body.length}\r\n\r\n#{body}"
-    connection.response
-  end
-  alias_method :request, :create_request
-
   def spec_dir(relative_path="")
     absolute_path = spec_root_path + relative_path
     JsTestCore::Resources::Specs::SpecDir.new(:connection => connection, :absolute_path => absolute_path, :relative_path => "/specs#{relative_path}")
   end
 
-  def contain_spec_file_with_correct_paths(path_relative_to_spec_root)
-    expected_absolute_path = spec_root_path + path_relative_to_spec_root
-    expected_relative_path = "/specs" + path_relative_to_spec_root
+  def be_http(status, headers, body)
+    SimpleMatcher.new(nil) do |given, matcher|
+      description = (<<-DESC).gsub(/^ +/, "")
+      be an http of
+      expected status: #{status.inspect}
+      actual status  : #{given.status.inspect}
 
-    ::Spec::Matchers::SimpleMatcher.new(expected_relative_path) do |globbed_files|
-      file = globbed_files.find do |file|
-        file.absolute_path == expected_absolute_path
+      expected headers containing: #{headers.inspect}
+      actual headers             : #{given.headers.inspect}
+
+      expected body containing: #{body.inspect}
+      actual body             : #{given.body.inspect}
+      DESC
+      matcher.failure_message = description
+      matcher.negative_failure_message = "not #{description}"
+
+      passed = true
+      unless given.status == status
+        passed = false
       end
-      raise "Did not find file with absolute path of #{expected_absolute_path.inspect}" unless file
-      file.relative_path == expected_relative_path
-    end
-  end
-
-  def stub_send_data
-    stub(EventMachine).send_data do |signature, data, data_length|
-      data_length
+      unless headers.all?{|k, v| given.headers[k] == headers[k]}
+        passed = false
+      end
+      unless given.body.include?(body)
+        passed = false
+      end
+      passed
     end
   end
 end
