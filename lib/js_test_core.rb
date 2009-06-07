@@ -17,7 +17,6 @@ require "erector"
 
 require "#{dir}/js_test_core/extensions"
 require "#{dir}/js_test_core/thin"
-require "#{dir}/js_test_core/rack"
 require "#{dir}/js_test_core/resources"
 require "#{dir}/js_test_core/representations"
 require "#{dir}/js_test_core/selenium"
