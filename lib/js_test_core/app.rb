@@ -9,5 +9,6 @@ module JsTestCore
     register(JsTestCore::Resources::Specs::SpecFile.route_handler)
     register(JsTestCore::Resources::Dir.route_handler)
     register(JsTestCore::Resources::File.route_handler)
+    register(JsTestCore::Resources::NotFound.route_handler)
   end
 end

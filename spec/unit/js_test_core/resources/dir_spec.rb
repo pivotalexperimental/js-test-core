@@ -26,17 +26,6 @@ module JsTestCore
           )
         end
       end
-
-      describe "GET /javascripts/i_dont_exist - ResourceNotFound" do
-        it "returns a 404 error" do
-          response = get("/javascripts/i_dont_exist")
-          response.should be_http(
-            404,
-            {},
-            Regexp.new("File /javascripts/i_dont_exist not found")
-          )
-        end
-      end
     end
   end
 end
