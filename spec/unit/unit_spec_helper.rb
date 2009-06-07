@@ -18,12 +18,6 @@ Spec::Runner.configure do |config|
   config.mock_with :rr
 end
 
-class JsTestCoreTestDir < JsTestCore::Resources::Dir
-  def get
-
-  end
-end
-
 Sinatra::Application.use ShowTestExceptions
 Sinatra::Application.set :raise_errors, true
 Sinatra::Application.register(JsTestCore::Resources::WebRoot.route_handler)
