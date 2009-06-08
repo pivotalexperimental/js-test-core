@@ -22,8 +22,8 @@ module JsTestCore
               driver
             end
 
-            post(Runner.path('firefox'))
-            @session_runner = Runner.find(session_id)
+            post(SeleniumSession.path('firefox'))
+            @session_runner = SeleniumSession.find(session_id)
             session_runner.should be_running
           end
 

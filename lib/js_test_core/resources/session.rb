@@ -4,7 +4,7 @@ module JsTestCore
       map "/sessions"
 
       get "/:session_id" do
-        runner = Runner.find(session_id)
+        runner = SeleniumSession.find(session_id)
         if runner
           body = if runner.running?
             "status=#{RUNNING}"

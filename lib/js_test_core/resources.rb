@@ -6,7 +6,7 @@ module JsTestCore
 end
 
 require "#{dir}/resources/resource"
-require "#{dir}/resources/runner"
+require "#{dir}/resources/selenium_session"
 require "#{dir}/resources/file"
 require "#{dir}/resources/spec_file"
 require "#{dir}/resources/core_file"

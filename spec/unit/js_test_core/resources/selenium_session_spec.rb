@@ -1,8 +1,8 @@
-require File.expand_path("#{File.dirname(__FILE__)}/../../../unit_spec_helper")
+require File.expand_path("#{File.dirname(__FILE__)}/../../unit_spec_helper")
 
 module JsTestCore
   module Resources
-    describe Runner do
+    describe SeleniumSession do
       attr_reader :request, :driver, :session_id, :selenium_browser_start_command
 
       def self.before_with_selenium_browser_start_command(selenium_browser_start_command="selenium browser start command")
@@ -17,42 +17,42 @@ module JsTestCore
       end
 
       after do
-        Runner.send(:instances).clear
+        SeleniumSession.send(:instances).clear
       end
 
       describe ".find" do
-        attr_reader :runner
+        attr_reader :selenium_session
         before_with_selenium_browser_start_command
         before do
-          @runner = Runner.new(:connection => connection, :selenium_browser_start_command => selenium_browser_start_command)
-          stub(runner).driver {driver}
+          @selenium_session = SeleniumSession.new(:connection => connection, :selenium_browser_start_command => selenium_browser_start_command)
+          stub(selenium_session).driver {driver}
           stub(driver).session_id {session_id}
-          Runner.register(runner)
+          SeleniumSession.register(selenium_session)
         end
         
-        context "when passed an id for which there is a corresponding Runner" do
-          it "returns the Runner" do
-            Runner.find(session_id).should == runner
+        context "when passed an id for which there is a corresponding selenium_session" do
+          it "returns the selenium_session" do
+            SeleniumSession.find(session_id).should == selenium_session
           end
         end
 
-        context "when passed an id for which there is no corresponding Runner" do
+        context "when passed an id for which there is no corresponding selenium_session" do
           it "returns nil" do
             invalid_id = "666666666666666"
-            Runner.find(invalid_id).should be_nil
+            SeleniumSession.find(invalid_id).should be_nil
           end
         end
       end
 
-      describe "POST /runners" do
+      describe "POST /selenium_sessions" do
         before_with_selenium_browser_start_command
         before do
           stub(Thread).start.yields
         end
 
         it "responds with a 200 and the session_id" do
-          Runner.find(session_id).should be_nil
-          response = post(Runner.path("/"), {:selenium_browser_start_command => selenium_browser_start_command})
+          SeleniumSession.find(session_id).should be_nil
+          response = post(SeleniumSession.path("/"), {:selenium_browser_start_command => selenium_browser_start_command})
           body = "session_id=#{session_id}"
           response.should be_http(
             200,
@@ -71,7 +71,7 @@ module JsTestCore
           mock(Selenium::Client::Driver).new('localhost', 4444, selenium_browser_start_command, 'http://0.0.0.0:8080') do
             driver
           end
-          response = post(Runner.path("/"), {:selenium_browser_start_command => selenium_browser_start_command})
+          response = post(SeleniumSession.path("/"), {:selenium_browser_start_command => selenium_browser_start_command})
         end
 
         describe "when a selenium_host parameter is passed into the request" do
@@ -79,7 +79,7 @@ module JsTestCore
             mock(Selenium::Client::Driver).new('another-machine', 4444, selenium_browser_start_command, 'http://0.0.0.0:8080') do
               driver
             end
-            response = post(Runner.path("/"), {
+            response = post(SeleniumSession.path("/"), {
               :selenium_browser_start_command => selenium_browser_start_command,
               :selenium_host => "another-machine"
             })
@@ -91,7 +91,7 @@ module JsTestCore
             mock(Selenium::Client::Driver).new('localhost', 4444, selenium_browser_start_command, 'http://0.0.0.0:8080') do
               driver
             end
-            response = post(Runner.path("/"), {
+            response = post(SeleniumSession.path("/"), {
               :selenium_browser_start_command => selenium_browser_start_command,
               :selenium_host => ""
             })
@@ -103,7 +103,7 @@ module JsTestCore
             mock(Selenium::Client::Driver).new('localhost', 4000, selenium_browser_start_command, 'http://0.0.0.0:8080') do
               driver
             end
-            response = post(Runner.path("/"), {
+            response = post(SeleniumSession.path("/"), {
               :selenium_browser_start_command => selenium_browser_start_command,
               :selenium_port => "4000"
             })
@@ -115,7 +115,7 @@ module JsTestCore
             mock(Selenium::Client::Driver).new('localhost', 4444, selenium_browser_start_command, 'http://0.0.0.0:8080') do
               driver
             end
-            response = post(Runner.path("/"), {
+            response = post(SeleniumSession.path("/"), {
               :selenium_browser_start_command => selenium_browser_start_command,
               :selenium_port => ""
             })
@@ -133,7 +133,7 @@ module JsTestCore
             mock(driver).open("/specs/subdir")
             mock(driver).session_id {session_id}.at_least(1)
 
-            response = post(Runner.path("/"), {
+            response = post(SeleniumSession.path("/"), {
               :selenium_browser_start_command => selenium_browser_start_command,
               :spec_url => "http://another-host:8080/specs/subdir"
             })
@@ -154,7 +154,7 @@ module JsTestCore
             mock(driver).open("/specs")
             mock(driver).session_id {session_id}.at_least(1)
 
-            response = post(Runner.path("/"), {
+            response = post(SeleniumSession.path("/"), {
               :selenium_browser_start_command => selenium_browser_start_command,
               :spec_url => ""
             })
@@ -162,12 +162,12 @@ module JsTestCore
         end
       end
 
-      describe "POST /runners/firefox" do
+      describe "POST /selenium_sessions/firefox" do
         before_with_selenium_browser_start_command "*firefox"
 
-        it "creates a Runner whose #driver started with '*firefox'" do
-          Runner.find(session_id).should be_nil
-          response = post(Runner.path("/firefox"))
+        it "creates a selenium_session whose #driver started with '*firefox'" do
+          SeleniumSession.find(session_id).should be_nil
+          response = post(SeleniumSession.path("/firefox"))
           body = "session_id=#{session_id}"
           response.should be_http(
             200,
@@ -175,18 +175,18 @@ module JsTestCore
             body
           )
 
-          runner = Runner.find(session_id)
-          runner.class.should == Runner
-          runner.driver.should == driver
+          selenium_session = SeleniumSession.find(session_id)
+          selenium_session.class.should == SeleniumSession
+          selenium_session.driver.should == driver
         end
       end
 
-      describe "POST /runners/iexplore" do
+      describe "POST /selenium_sessions/iexplore" do
         before_with_selenium_browser_start_command "*iexplore"
 
-        it "creates a Runner whose #driver started with '*iexplore'" do
-          Runner.find(session_id).should be_nil
-          response = post(Runner.path("/iexplore"))
+        it "creates a selenium_session whose #driver started with '*iexplore'" do
+          SeleniumSession.find(session_id).should be_nil
+          response = post(SeleniumSession.path("/iexplore"))
           body = "session_id=#{session_id}"
           response.should be_http(
             200,
@@ -194,9 +194,9 @@ module JsTestCore
             body
           )
 
-          runner = Runner.find(session_id)
-          runner.class.should == Runner
-          runner.driver.should == driver
+          selenium_session = SeleniumSession.find(session_id)
+          selenium_session.class.should == SeleniumSession
+          selenium_session.driver.should == driver
         end
       end
 
@@ -204,70 +204,70 @@ module JsTestCore
         before_with_selenium_browser_start_command
         context "when the driver#session_started? is true" do
           it "returns true" do
-            response = post(Runner.path("/"), {:selenium_browser_start_command => selenium_browser_start_command})
+            response = post(SeleniumSession.path("/"), {:selenium_browser_start_command => selenium_browser_start_command})
             response.should be_http(
               200,
               {},
               ""
             )
 
-            runner = Resources::Runner.find(session_id)
-            runner.driver.session_started?.should be_true
-            runner.should be_running
+            selenium_session = Resources::SeleniumSession.find(session_id)
+            selenium_session.driver.session_started?.should be_true
+            selenium_session.should be_running
           end
         end
 
         context "when the driver#session_started? is false" do
           it "returns false" do
-            response = post(Runner.path("/"), {:selenium_browser_start_command => selenium_browser_start_command})
+            response = post(SeleniumSession.path("/"), {:selenium_browser_start_command => selenium_browser_start_command})
             response.should be_http(
               200,
               {},
               ""
             )
 
-            runner = Resources::Runner.find(session_id)
-            runner.driver.stop
-            runner.driver.session_started?.should be_false
-            runner.should_not be_running
+            selenium_session = Resources::SeleniumSession.find(session_id)
+            selenium_session.driver.stop
+            selenium_session.driver.session_started?.should be_false
+            selenium_session.should_not be_running
           end
         end
       end
 
       describe "#finalize" do
-        attr_reader :runner
+        attr_reader :selenium_session
         before_with_selenium_browser_start_command
         before do
-          response = post(Runner.path("/"), {:selenium_browser_start_command => selenium_browser_start_command})
+          response = post(SeleniumSession.path("/"), {:selenium_browser_start_command => selenium_browser_start_command})
           response.status.should == 200
-          @runner = Resources::Runner.find(session_id)
+          @selenium_session = Resources::SeleniumSession.find(session_id)
           mock.proxy(driver).stop
         end
 
         it "kills the browser and stores the #session_run_result" do
           session_run_result = "The session run result"
-          runner.finalize(session_run_result)
-          runner.session_run_result.should == session_run_result
+          selenium_session.finalize(session_run_result)
+          selenium_session.session_run_result.should == session_run_result
         end
 
         it "sets #session_run_result" do
-          runner.finalize("the result")
-          runner.session_run_result.should == "the result"
+          selenium_session.finalize("the result")
+          selenium_session.session_run_result.should == "the result"
         end
 
         context "when passed an empty string" do
           it "causes #successful? to be true" do
-            runner.finalize("")
-            runner.should be_successful
-            runner.should_not be_failed
+            selenium_session.finalize("")
+            selenium_session.should be_successful
+            selenium_session.should_not be_failed
           end
         end
 
         context "when passed a non-empty string" do
           it "causes #successful? to be false" do
-            runner.finalize("A bunch of error stuff")
-            runner.should_not be_successful
-            runner.should be_failed
+            selenium_session.finalize("A bunch of error stuff")
+            selenium_session.should_not be_successful
+            selenium_session.should be_failed
           end
         end
       end

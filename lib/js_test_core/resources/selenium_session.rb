@@ -1,13 +1,13 @@
 module JsTestCore
   module Resources
-    class Runner < Resource
+    class SeleniumSession < Resource
       class << self
         def find(id)
           instances[id.to_s]
         end
 
-        def register(runner)
-          instances[runner.session_id] = runner
+        def register(selenium_session)
+          instances[selenium_session.session_id] = selenium_session
         end
 
         protected
@@ -16,7 +16,7 @@ module JsTestCore
         end
       end
 
-      map "/runners"
+      map "/selenium_sessions"
       include FileUtils
       attr_reader :driver, :session_run_result
 
@@ -71,7 +71,7 @@ module JsTestCore
         rescue Errno::ECONNREFUSED => e
           raise Errno::ECONNREFUSED, "Cannot connect to Selenium Server at #{http_address}. To start the selenium server, run `selenium`."
         end
-        Runner.register(self)
+        SeleniumSession.register(self)
         Thread.start do
           driver.open("/")
           driver.create_cookie("session_id=#{session_id}")
