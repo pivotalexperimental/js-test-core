@@ -1,7 +1,7 @@
 module JsTestCore
   module Resources
-    class SessionFinish < Resources::Resource
-      map("/sessions")
+    class SeleniumSessionFinish < Resources::Resource
+      map("/selenium_sessions")
 
       post "/finish" do
         call
