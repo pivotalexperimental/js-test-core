@@ -7,8 +7,6 @@ module JsTestCore
       SUCCESSFUL_COMPLETION = 'success'
       FAILURE_COMPLETION = 'failure'
       
-      attr_reader :driver
-
       post "/" do
         do_post params["selenium_browser_start_command"]
       end
