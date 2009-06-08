@@ -44,37 +44,6 @@ module JsTestCore
         end
       end
 
-      describe ".finalize" do
-        attr_reader :runner
-        before_with_selenium_browser_start_command
-        describe "when there is a runner for the passed in session_id" do
-          before do
-            @runner = Runner.new(:connection => connection, :selenium_browser_start_command => selenium_browser_start_command)
-            stub(runner).driver {driver}
-            stub(driver).session_id {"DEADBEEF"}
-
-            Runner.register(runner)
-            runner.session_id.should == session_id
-          end
-
-          it "finalizes the Runner that has the session_id and keeps the Runner in memory" do
-            mock.proxy(driver).stop
-            mock.proxy(runner).finalize("Browser output")
-            Runner.find(session_id).should == runner
-            Runner.finalize(session_id, "Browser output")
-            Runner.find(session_id).should == runner
-          end
-        end
-
-        describe "when there is not a runner for the passed in session_id" do
-          it "does nothing" do
-            lambda do
-              Runner.finalize("6666666", "nothing happens")
-            end.should_not raise_error
-          end
-        end
-      end
-
       describe "POST /runners" do
         before_with_selenium_browser_start_command
         before do

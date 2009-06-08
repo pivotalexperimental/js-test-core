@@ -14,16 +14,22 @@ module JsTestCore
       end
 
       describe "POST /sessions/finish" do
-        it "returns the text and writes the text to stdout" do
-          text = "The text in the POST body"
+        context "when passed a :session_id parameter" do
+          it "returns the text and writes the text to stdout" do
+            text = "The text in the POST body"
 
-          response = post(SessionFinish.path("/finish", :session_id => 1), :text => text)
-          response.should be_http(
-            200,
-            {},
-            text
-          )
-          stdout.string.should == "#{text}\n"
+            response = post(SessionFinish.path("/finish", :session_id => 1), :text => text)
+            response.should be_http(
+              200,
+              {},
+              text
+            )
+            stdout.string.should == "#{text}\n"
+          end
+        end
+
+        context "when the session_id cookie is set" do
+
         end
       end
 

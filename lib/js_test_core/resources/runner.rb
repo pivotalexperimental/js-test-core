@@ -6,12 +6,6 @@ module JsTestCore
           instances[id.to_s]
         end
 
-        def finalize(session_id, text)
-          if runner = find(session_id)
-            runner.finalize(text)
-          end
-        end
-
         def register(runner)
           instances[runner.session_id] = runner
         end
