@@ -2,11 +2,7 @@ module JsTestCore
   module Resources
     class SeleniumSession < Resource
       map "/selenium_sessions"
-      include FileUtils
-      RUNNING = 'running'
-      SUCCESSFUL_COMPLETION = 'success'
-      FAILURE_COMPLETION = 'failure'
-      
+
       post "/" do
         do_post params["selenium_browser_start_command"]
       end
@@ -20,6 +16,17 @@ module JsTestCore
       end
 
       get "/:session_id" do
+        do_get
+      end
+
+      include FileUtils
+      RUNNING = 'running'
+      SUCCESSFUL_COMPLETION = 'success'
+      FAILURE_COMPLETION = 'failure'
+
+      protected
+
+      def do_get
         selenium_session = Models::SeleniumSession.find(session_id)
         if selenium_session
           body = if selenium_session.running?
@@ -49,7 +56,6 @@ module JsTestCore
         end
       end
 
-      protected
       def session_id
         params["session_id"]
       end
