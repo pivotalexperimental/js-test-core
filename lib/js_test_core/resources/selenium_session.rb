@@ -1,24 +1,13 @@
 module JsTestCore
   module Resources
     class SeleniumSession < Resource
-      class << self
-        def find(id)
-          instances[id.to_s]
-        end
-
-        def register(selenium_session)
-          instances[selenium_session.session_id] = selenium_session
-        end
-
-        protected
-        def instances
-          @instances ||= {}
-        end
-      end
-
       map "/selenium_sessions"
       include FileUtils
-      attr_reader :driver, :run_result
+      RUNNING = 'running'
+      SUCCESSFUL_COMPLETION = 'success'
+      FAILURE_COMPLETION = 'failure'
+      
+      attr_reader :driver
 
       post "/" do
         do_post params["selenium_browser_start_command"]
@@ -32,52 +21,51 @@ module JsTestCore
         do_post "*iexplore"
       end
 
-      def finalize(run_result)
-        driver.stop
-        @run_result = run_result.to_s
-      end
-
-      def running?
-        driver.session_started?
-      end
-
-      def successful?
-        !running? && run_result.empty?
-      end
-
-      def failed?
-        !running? && !successful?
-      end
-
-      def session_id
-        driver.session_id
+      get "/:session_id" do
+        selenium_session = Models::SeleniumSession.find(session_id)
+        if selenium_session
+          body = if selenium_session.running?
+            "status=#{RUNNING}"
+          else
+            if selenium_session.successful?
+              "status=#{SUCCESSFUL_COMPLETION}"
+            else
+              "status=#{FAILURE_COMPLETION}&reason=#{selenium_session.run_result}"
+            end
+          end
+          [
+            200,
+            {'Content-Length' => body.length},
+            body
+          ]
+        else
+          body = Representations::NotFound.new(:message => "Could not find session #{session_id}").to_s
+          [
+            404,
+            {
+              "Content-Type" => "text/html",
+              "Content-Length" => body.size.to_s
+            },
+            body
+          ]
+        end
       end
 
       protected
+      def session_id
+        params["session_id"]
+      end
+
       def do_post(selenium_browser_start_command)
-        spec_url = request['spec_url'].to_s == "" ? full_spec_suite_url : request['spec_url']
-        parsed_spec_url = URI.parse(spec_url)
-        selenium_host = request['selenium_host'].to_s == "" ? 'localhost' : request['selenium_host'].to_s
-        selenium_port = request['selenium_port'].to_s == "" ? 4444 : Integer(request['selenium_port'])
-        http_address = "#{parsed_spec_url.scheme}://#{parsed_spec_url.host}:#{parsed_spec_url.port}"
-        @driver = Selenium::Client::Driver.new(
-          selenium_host,
-          selenium_port,
-          selenium_browser_start_command,
-          http_address
-        )
-        begin
-          driver.start
-        rescue Errno::ECONNREFUSED => e
-          raise Errno::ECONNREFUSED, "Cannot connect to Selenium Server at #{http_address}. To start the selenium server, run `selenium`."
-        end
-        SeleniumSession.register(self)
-        Thread.start do
-          driver.open("/")
-          driver.create_cookie("session_id=#{session_id}")
-          driver.open(parsed_spec_url.path)
-        end
-        body = "session_id=#{session_id}"
+        selenium_session = Models::SeleniumSession.new({
+          :spec_url => request['spec_url'].to_s == "" ? full_spec_suite_url : request['spec_url'],
+          :selenium_browser_start_command => selenium_browser_start_command,
+          :selenium_host => request['selenium_host'].to_s == "" ? 'localhost' : request['selenium_host'].to_s,
+          :selenium_port => request['selenium_port'].to_s == "" ? 4444 : Integer(request['selenium_port'])
+        })
+        selenium_session.start
+
+        body = "session_id=#{selenium_session.session_id}"
         [
           200,
           {

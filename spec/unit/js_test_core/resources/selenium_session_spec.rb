@@ -17,31 +17,7 @@ module JsTestCore
       end
 
       after do
-        SeleniumSession.send(:instances).clear
-      end
-
-      describe ".find" do
-        attr_reader :selenium_session
-        before_with_selenium_browser_start_command
-        before do
-          @selenium_session = SeleniumSession.new(:connection => connection, :selenium_browser_start_command => selenium_browser_start_command)
-          stub(selenium_session).driver {driver}
-          stub(driver).session_id {session_id}
-          SeleniumSession.register(selenium_session)
-        end
-        
-        context "when passed an id for which there is a corresponding selenium_session" do
-          it "returns the selenium_session" do
-            SeleniumSession.find(session_id).should == selenium_session
-          end
-        end
-
-        context "when passed an id for which there is no corresponding selenium_session" do
-          it "returns nil" do
-            invalid_id = "666666666666666"
-            SeleniumSession.find(invalid_id).should be_nil
-          end
-        end
+        Models::SeleniumSession.send(:instances).clear
       end
 
       describe "POST /selenium_sessions" do
@@ -51,7 +27,7 @@ module JsTestCore
         end
 
         it "responds with a 200 and the session_id" do
-          SeleniumSession.find(session_id).should be_nil
+          Models::SeleniumSession.find(session_id).should be_nil
           response = post(SeleniumSession.path("/"), {:selenium_browser_start_command => selenium_browser_start_command})
           body = "session_id=#{session_id}"
           response.should be_http(
@@ -166,7 +142,7 @@ module JsTestCore
         before_with_selenium_browser_start_command "*firefox"
 
         it "creates a selenium_session whose #driver started with '*firefox'" do
-          SeleniumSession.find(session_id).should be_nil
+          Models::SeleniumSession.find(session_id).should be_nil
           response = post(SeleniumSession.path("/firefox"))
           body = "session_id=#{session_id}"
           response.should be_http(
@@ -175,8 +151,8 @@ module JsTestCore
             body
           )
 
-          selenium_session = SeleniumSession.find(session_id)
-          selenium_session.class.should == SeleniumSession
+          selenium_session = Models::SeleniumSession.find(session_id)
+          selenium_session.class.should == Models::SeleniumSession
           selenium_session.driver.should == driver
         end
       end
@@ -185,7 +161,7 @@ module JsTestCore
         before_with_selenium_browser_start_command "*iexplore"
 
         it "creates a selenium_session whose #driver started with '*iexplore'" do
-          SeleniumSession.find(session_id).should be_nil
+          Models::SeleniumSession.find(session_id).should be_nil
           response = post(SeleniumSession.path("/iexplore"))
           body = "session_id=#{session_id}"
           response.should be_http(
@@ -194,80 +170,75 @@ module JsTestCore
             body
           )
 
-          selenium_session = SeleniumSession.find(session_id)
-          selenium_session.class.should == SeleniumSession
+          selenium_session = Models::SeleniumSession.find(session_id)
+          selenium_session.class.should == Models::SeleniumSession
           selenium_session.driver.should == driver
         end
       end
 
-      describe "#running?" do
-        before_with_selenium_browser_start_command
-        context "when the driver#session_started? is true" do
-          it "returns true" do
-            response = post(SeleniumSession.path("/"), {:selenium_browser_start_command => selenium_browser_start_command})
-            response.should be_http(
-              200,
-              {},
-              ""
-            )
-
-            selenium_session = Resources::SeleniumSession.find(session_id)
-            selenium_session.driver.session_started?.should be_true
-            selenium_session.should be_running
+      describe "GET /sessions/:session_id" do
+        context "when there is no Runner with the :session_id" do
+          it "responds with a 404" do
+            session_id = "invalid_session_id"
+            response = get(SeleniumSession.path(session_id))
+            response.body.should include("Could not find session #{session_id}")
+            response.status.should == 404
           end
         end
 
-        context "when the driver#session_started? is false" do
-          it "returns false" do
-            response = post(SeleniumSession.path("/"), {:selenium_browser_start_command => selenium_browser_start_command})
-            response.should be_http(
-              200,
-              {},
-              ""
-            )
+        context "when there is a Runner with the :session_id" do
+          attr_reader :driver, :session_id, :session_runner
+          before do
+            @driver = FakeSeleniumDriver.new
+            @session_id = FakeSeleniumDriver::SESSION_ID
+            stub(Selenium::Client::Driver).new('localhost', 4444, '*firefox', 'http://0.0.0.0:8080') do
+              driver
+            end
 
-            selenium_session = Resources::SeleniumSession.find(session_id)
-            selenium_session.driver.stop
-            selenium_session.driver.session_started?.should be_false
-            selenium_session.should_not be_running
+            post(SeleniumSession.path('firefox'))
+            @session_runner = Models::SeleniumSession.find(session_id)
+            session_runner.should be_running
           end
-        end
-      end
 
-      describe "#finalize" do
-        attr_reader :selenium_session
-        before_with_selenium_browser_start_command
-        before do
-          response = post(SeleniumSession.path("/"), {:selenium_browser_start_command => selenium_browser_start_command})
-          response.status.should == 200
-          @selenium_session = Resources::SeleniumSession.find(session_id)
-          mock.proxy(driver).stop
-        end
+          context "when a Runner with the :session_id is running" do
+            it "responds with a 200 and status=running" do
+              response = get(SeleniumSession.path(session_id))
 
-        it "kills the browser and stores the #run_result" do
-          run_result = "The session run result"
-          selenium_session.finalize(run_result)
-          selenium_session.run_result.should == run_result
-        end
-
-        it "sets #run_result" do
-          selenium_session.finalize("the result")
-          selenium_session.run_result.should == "the result"
-        end
-
-        context "when passed an empty string" do
-          it "causes #successful? to be true" do
-            selenium_session.finalize("")
-            selenium_session.should be_successful
-            selenium_session.should_not be_failed
+              body = "status=#{SeleniumSession::RUNNING}"
+              response.should be_http(200, {'Content-Length' => body.length.to_s}, body)
+            end
           end
-        end
 
-        context "when passed a non-empty string" do
-          it "causes #successful? to be false" do
-            selenium_session.finalize("A bunch of error stuff")
-            selenium_session.should_not be_successful
-            selenium_session.should be_failed
+          context "when a Runner with the :session_id has completed" do
+            context "when the session has a status of 'success'" do
+              before do
+                session_runner.finalize("")
+                session_runner.should be_successful
+              end
+
+              it "responds with a 200 and status=success" do
+                response = get(SeleniumSession.path(session_id))
+
+                body = "status=#{SeleniumSession::SUCCESSFUL_COMPLETION}"
+                response.should be_http(200, {'Content-Length' => body.length.to_s}, body)
+              end
+            end
+
+            context "when the session has a status of 'failure'" do
+              attr_reader :reason
+              before do
+                @reason = "Failure stuff"
+                session_runner.finalize(reason)
+                session_runner.should be_failed
+              end
+
+              it "responds with a 200 and status=failure and reason" do
+                response = get(SeleniumSession.path(session_id))
+
+                body = "status=#{SeleniumSession::FAILURE_COMPLETION}&reason=#{reason}"
+                response.should be_http(200, {'Content-Length' => body.length.to_s}, body)
+              end
+            end
           end
         end
       end

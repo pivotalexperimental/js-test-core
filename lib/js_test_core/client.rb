@@ -92,10 +92,10 @@ module JsTestCore
 
     def report_result
       case last_poll_status
-      when Resources::Session::SUCCESSFUL_COMPLETION
+      when Resources::SeleniumSession::SUCCESSFUL_COMPLETION
         STDOUT.puts "SUCCESS"
         true
-      when Resources::Session::FAILURE_COMPLETION
+      when Resources::SeleniumSession::FAILURE_COMPLETION
         STDOUT.puts "FAILURE"
         STDOUT.puts last_poll_reason
         false
@@ -105,7 +105,7 @@ module JsTestCore
     end
 
     def session_not_completed?
-      last_poll_status.nil? || last_poll_status == Resources::Session::RUNNING
+      last_poll_status.nil? || last_poll_status == Resources::SeleniumSession::RUNNING
     end
 
     def poll

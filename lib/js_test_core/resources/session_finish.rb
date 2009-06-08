@@ -12,7 +12,7 @@ module JsTestCore
       end
 
       def call
-        if runner = SeleniumSession.find(session_id)
+        if runner = Models::SeleniumSession.find(session_id)
           runner.finalize(request['text'])
         else
           STDOUT.puts request['text']

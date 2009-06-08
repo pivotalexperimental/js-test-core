@@ -3,7 +3,6 @@ module JsTestCore
     set :logging, true
     register(JsTestCore::Resources::WebRoot.route_handler)
     register(JsTestCore::Resources::SeleniumSession.route_handler)
-    register(JsTestCore::Resources::Session.route_handler)
     register(JsTestCore::Resources::SessionFinish.route_handler)
     register(JsTestCore::Resources::CoreFile.route_handler)
     register(JsTestCore::Resources::SpecFile.route_handler)

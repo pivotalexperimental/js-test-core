@@ -112,15 +112,15 @@ module JsTestCore
       end
 
       def running_status
-        "status=#{Resources::Session::RUNNING}"
+        "status=#{Resources::SeleniumSession::RUNNING}"
       end
 
       def success_status
-        "status=#{Resources::Session::SUCCESSFUL_COMPLETION}"
+        "status=#{Resources::SeleniumSession::SUCCESSFUL_COMPLETION}"
       end
 
       def failure_status(reason)
-        "status=#{Resources::Session::FAILURE_COMPLETION}&reason=#{reason}"
+        "status=#{Resources::SeleniumSession::FAILURE_COMPLETION}&reason=#{reason}"
       end
     end
 
