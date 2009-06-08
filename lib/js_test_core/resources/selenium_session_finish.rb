@@ -1,6 +1,6 @@
 module JsTestCore
   module Resources
-    class SeleniumSessionFinish < Resources::Resource
+    class SeleniumSessionFinish < Resource
       map("/selenium_sessions")
 
       post "/finish" do
