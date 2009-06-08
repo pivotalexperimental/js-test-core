@@ -212,7 +212,7 @@ module JsTestCore
           context "when a Runner with the :session_id has completed" do
             context "when the session has a status of 'success'" do
               before do
-                session_runner.finalize("")
+                session_runner.finish("")
                 session_runner.should be_successful
               end
 
@@ -228,7 +228,7 @@ module JsTestCore
               attr_reader :reason
               before do
                 @reason = "Failure stuff"
-                session_runner.finalize(reason)
+                session_runner.finish(reason)
                 session_runner.should be_failed
               end
 

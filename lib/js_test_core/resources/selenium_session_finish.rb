@@ -13,7 +13,7 @@ module JsTestCore
 
       def call
         if selenium_session = Models::SeleniumSession.find(session_id)
-          selenium_session.finalize(request['text'])
+          selenium_session.finish(request['text'])
         else
           STDOUT.puts request['text']
         end

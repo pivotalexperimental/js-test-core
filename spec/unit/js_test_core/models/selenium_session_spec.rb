@@ -55,18 +55,18 @@ module JsTestCore
 
         it "kills the browser and stores the #run_result" do
           run_result = "The session run result"
-          selenium_session.finalize(run_result)
+          selenium_session.finish(run_result)
           selenium_session.run_result.should == run_result
         end
 
         it "sets #run_result" do
-          selenium_session.finalize("the result")
+          selenium_session.finish("the result")
           selenium_session.run_result.should == "the result"
         end
 
         context "when passed an empty string" do
           it "causes #successful? to be true" do
-            selenium_session.finalize("")
+            selenium_session.finish("")
             selenium_session.should be_successful
             selenium_session.should_not be_failed
           end
@@ -74,7 +74,7 @@ module JsTestCore
 
         context "when passed a non-empty string" do
           it "causes #successful? to be false" do
-            selenium_session.finalize("A bunch of error stuff")
+            selenium_session.finish("A bunch of error stuff")
             selenium_session.should_not be_successful
             selenium_session.should be_failed
           end

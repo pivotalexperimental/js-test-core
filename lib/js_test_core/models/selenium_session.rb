@@ -53,7 +53,7 @@ module JsTestCore
         driver.session_id
       end
 
-      def finalize(run_result)
+      def finish(run_result)
         driver.stop
         @run_result = run_result.to_s
       end
