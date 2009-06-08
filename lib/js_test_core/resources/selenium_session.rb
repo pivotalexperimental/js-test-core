@@ -19,6 +19,14 @@ module JsTestCore
         do_get
       end
 
+      post "/finish" do
+        do_finish
+      end
+
+      post "/:session_id/finish" do
+        do_finish
+      end
+
       include FileUtils
       RUNNING = 'running'
       SUCCESSFUL_COMPLETION = 'success'
@@ -54,6 +62,15 @@ module JsTestCore
             body
           ]
         end
+      end
+
+      def do_finish
+        if selenium_session = Models::SeleniumSession.find(session_id)
+          selenium_session.finish(request['text'])
+        else
+          STDOUT.puts request['text']
+        end
+        [200, {}, request['text']]
       end
 
       def session_id
