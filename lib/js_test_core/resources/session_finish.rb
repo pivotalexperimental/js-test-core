@@ -12,8 +12,7 @@ module JsTestCore
       end
 
       def call
-        runner = Runner.find(session_id)
-        if runner
+        if runner = Runner.find(session_id)
           runner.finalize(request['text'])
         else
           STDOUT.puts request['text']
