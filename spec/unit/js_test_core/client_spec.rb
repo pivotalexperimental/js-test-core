@@ -98,7 +98,7 @@ module JsTestCore
 
       def mock_post_to_runner(selenium_browser_start_command)
         mock(start_session_response = Object.new).body {"session_id=my_session_id"}
-        mock(request).post("/runners", "selenium_browser_start_command=#{CGI.escape(selenium_browser_start_command)}&selenium_host=localhost&selenium_port=4444") do
+        mock(request).post(Resources::SeleniumSession.path, "selenium_browser_start_command=#{CGI.escape(selenium_browser_start_command)}&selenium_host=localhost&selenium_port=4444") do
           start_session_response
         end
       end

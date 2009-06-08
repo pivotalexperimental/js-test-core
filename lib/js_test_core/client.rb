@@ -80,7 +80,7 @@ module JsTestCore
     end
 
     def start_runner
-      @session_start_response = http.post('/runners', query_string)
+      @session_start_response = http.post(Resources::SeleniumSession.path, query_string)
     end
 
     def wait_for_session_to_finish
