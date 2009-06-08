@@ -255,22 +255,90 @@ module JsTestCore
         end
 
         describe "POST /selenium_sessions/finish" do
+          attr_reader :selenium_session
           context "when passed a :session_id parameter" do
-            it "returns the text and writes the text to stdout" do
-              text = "The text in the POST body"
+            context "when :session_id does not match a registered SeleniumSession" do
+              it "returns the text and writes the text to stdout" do
+                Models::SeleniumSession.find(1).should be_nil
 
-              response = post(SeleniumSession.path("/finish", :session_id => 1), :text => text)
-              response.should be_http(
-                200,
-                {},
-                text
-              )
-              stdout.string.should == "#{text}\n"
+                text = "The text in the POST body"
+                response = post(SeleniumSession.path("/finish", :session_id => 1), :text => text)
+                response.should be_http(
+                  200,
+                  {},
+                  text
+                )
+                stdout.string.should == "#{text}\n"
+              end
+            end
+
+            context "when :session_id matches a registered SeleniumSession" do
+              before do
+                @driver = FakeSeleniumDriver.new
+                @selenium_session = Models::SeleniumSession.new(:spec_url => "http://localhost:8080/specs")
+                stub(selenium_session).driver {driver}
+                driver.start
+                @session_id = driver.session_id
+                Models::SeleniumSession.register(selenium_session)
+              end
+
+              it "finishes the SeleniumSession" do
+                text = "The text in the POST body"
+                mock.proxy(selenium_session).finish(text)
+                selenium_session.should be_running
+
+                response = post(SeleniumSession.path("/finish", :session_id => session_id), :text => text)
+                response.should be_http(
+                  200,
+                  {},
+                  text
+                )
+                selenium_session.should_not be_running
+              end
             end
           end
 
           context "when the session_id cookie is set" do
+            context "when :session_id does not match a registered SeleniumSession" do
+              it "returns the text and writes the text to stdout" do
+                Models::SeleniumSession.find(1).should be_nil
 
+                text = "The text in the POST body"
+                response = post(SeleniumSession.path("/finish"), {:text => text}, {:cookie => "session_id=1"})
+                response.should be_http(
+                  200,
+                  {},
+                  text
+                )
+                stdout.string.should == "#{text}\n"
+              end
+            end
+
+            context "when :session_id matches a registered SeleniumSession" do
+              attr_reader :selenium_session
+              before do
+                @driver = FakeSeleniumDriver.new
+                @selenium_session = Models::SeleniumSession.new(:spec_url => "http://localhost:8080/specs")
+                stub(selenium_session).driver {driver}
+                driver.start
+                @session_id = driver.session_id
+                Models::SeleniumSession.register(selenium_session)
+              end
+
+              it "finishes the SeleniumSession" do
+                text = "The text in the POST body"
+                mock.proxy(selenium_session).finish(text)
+                selenium_session.should be_running
+
+                response = post(SeleniumSession.path("/finish"), {:text => text}, {:cookie => "session_id=#{session_id}"})
+                response.should be_http(
+                  200,
+                  {},
+                  text
+                )
+                selenium_session.should_not be_running
+              end
+            end
           end
         end
 
@@ -287,8 +355,8 @@ module JsTestCore
             stdout.string.should == "#{text}\n"
           end
         end
-      end
 
+      end
     end
   end
 end

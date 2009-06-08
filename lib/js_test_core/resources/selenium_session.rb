@@ -74,7 +74,7 @@ module JsTestCore
       end
 
       def session_id
-        params["session_id"]
+        params["session_id"] || request.cookies["session_id"]
       end
 
       def do_post(selenium_browser_start_command)
