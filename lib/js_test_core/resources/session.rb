@@ -12,7 +12,7 @@ module JsTestCore
             if runner.successful?
               "status=#{SUCCESSFUL_COMPLETION}"
             else
-              "status=#{FAILURE_COMPLETION}&reason=#{runner.session_run_result}"
+              "status=#{FAILURE_COMPLETION}&reason=#{runner.run_result}"
             end
           end
           [

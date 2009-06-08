@@ -244,15 +244,15 @@ module JsTestCore
           mock.proxy(driver).stop
         end
 
-        it "kills the browser and stores the #session_run_result" do
-          session_run_result = "The session run result"
-          selenium_session.finalize(session_run_result)
-          selenium_session.session_run_result.should == session_run_result
+        it "kills the browser and stores the #run_result" do
+          run_result = "The session run result"
+          selenium_session.finalize(run_result)
+          selenium_session.run_result.should == run_result
         end
 
-        it "sets #session_run_result" do
+        it "sets #run_result" do
           selenium_session.finalize("the result")
-          selenium_session.session_run_result.should == "the result"
+          selenium_session.run_result.should == "the result"
         end
 
         context "when passed an empty string" do

@@ -18,7 +18,7 @@ module JsTestCore
 
       map "/selenium_sessions"
       include FileUtils
-      attr_reader :driver, :session_run_result
+      attr_reader :driver, :run_result
 
       post "/" do
         do_post params["selenium_browser_start_command"]
@@ -32,9 +32,9 @@ module JsTestCore
         do_post "*iexplore"
       end
 
-      def finalize(session_run_result)
+      def finalize(run_result)
         driver.stop
-        @session_run_result = session_run_result.to_s
+        @run_result = run_result.to_s
       end
 
       def running?
@@ -42,7 +42,7 @@ module JsTestCore
       end
 
       def successful?
-        !running? && session_run_result.empty?
+        !running? && run_result.empty?
       end
 
       def failed?
