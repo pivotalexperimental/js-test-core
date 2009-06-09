@@ -15,6 +15,10 @@ module JsTestCore
         spec_files.each do |file|
           script :type => "text/javascript", :src => file
         end
+        script_to_set_window_session_id
+      end
+
+      def script_to_set_window_session_id
         script "window._session_id = '#{session_id}';", :type => "text/javascript"
       end
       
