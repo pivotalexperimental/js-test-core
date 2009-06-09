@@ -57,11 +57,11 @@ module JsTestCore
       end
 
       describe "#start" do
-        it "starts the Selenium Driver, creates a SessionID cookie, and opens the spec page" do
-          mock(driver).start
-          mock(driver).create_cookie("session_id=#{driver.session_id}")
-          mock(driver).open("/")
-          mock(driver).open("/specs")
+        it "starts the Selenium Driver and opens the spec page with the session_id in the params" do
+          stub(Thread).start.yields
+          mock.proxy(driver).start
+          mock.proxy(driver).open("/")
+          mock.proxy(driver).open("/specs?session_id=#{FakeSeleniumDriver::SESSION_ID}")
 
           selenium_session.start
         end
