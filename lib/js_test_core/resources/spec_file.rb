@@ -44,8 +44,7 @@ module JsTestCore
           200,
           {
             'Content-Type' => "text/html",
-            'Last-Modified' => ::File.mtime(real_path).rfc822,
-            'Content-Length' => html.length
+            'Last-Modified' => ::File.mtime(real_path).rfc822
           },
           html
         ]
