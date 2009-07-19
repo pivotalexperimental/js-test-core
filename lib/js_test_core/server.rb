@@ -34,7 +34,7 @@ module JsTestCore
         opt(
           :port,
           "The server port",
-          :default => 8080,
+          :default => DEFAULT_PORT,
           :type => Integer
         )
       end
