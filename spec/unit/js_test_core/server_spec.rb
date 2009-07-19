@@ -3,13 +3,15 @@ require File.expand_path("#{File.dirname(__FILE__)}/../unit_spec_helper")
 module JsTestCore
   describe Server do
     describe ".cli" do
-      attr_reader :server, :builder, :stdout
+      attr_reader :server, :builder, :stdout, :rackup_path
       before do
         @server = Server.new
         @builder = "builder"
 
         @stdout = StringIO.new
         Server.const_set(:STDOUT, stdout)
+
+        @rackup_path = File.expand_path("#{File.dirname(__FILE__)}/../../../standalone.ru")
       end
 
       after do
@@ -21,7 +23,9 @@ module JsTestCore
         it "starts the server" do
           project_spec_dir = File.expand_path("#{File.dirname(__FILE__)}/../..")
 
-          mock.instance_of(Thin::Runner).run!
+          mock.proxy(Thin::Runner).new(["--port", "8081", "--rackup", rackup_path, "start"]) do |runner|
+            mock(runner).run!
+          end
 
           stub.proxy(Rack::Builder).new do |builder|
             mock.proxy(builder).use(JsTestCore::App)
@@ -33,7 +37,8 @@ module JsTestCore
             "--framework-name", "screw-unit",
             "--framework-path", "#{project_spec_dir}/example_framework",
             "--root-path", "#{project_spec_dir}/example_root",
-            "--spec-path", "#{project_spec_dir}/example_spec"
+            "--spec-path", "#{project_spec_dir}/example_spec",
+            "--port", "8081"
           )
         end
       end
