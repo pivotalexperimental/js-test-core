@@ -2,46 +2,54 @@ require File.expand_path("#{File.dirname(__FILE__)}/../unit_spec_helper")
 
 module JsTestCore
   describe Server do
-    describe ".standalone_rackup" do
-      attr_reader :builder
+    describe ".cli" do
+      attr_reader :server, :builder, :stdout
       before do
-        stub(Server).puts
+        @server = Server.new
         @builder = "builder"
+
+        @stdout = StringIO.new
+        Server.const_set(:STDOUT, stdout)
       end
 
-      context "when passed a nil spec_path and a nil root_path" do
-        it "defaults spec_path to ./spec/javascripts and root_path to ./public" do
-          expected_spec_path = File.expand_path("./spec/javascripts")
-          mock(File).directory?( expected_spec_path) {true}
-          expected_root_path = File.expand_path("./public")
-          mock(File).directory?( expected_root_path) {true}
-          mock(builder).use(JsTestCore::App)
-          mock(builder).run(Sinatra::Application)
+      after do
+        Server.__send__(:remove_const, :STDOUT)
+      end
 
-          Server.standalone_rackup(builder, nil, nil)
+      
+      context "when the --framework-name and --framework-path are set" do
+        it "starts the server" do
+          project_spec_dir = File.expand_path("#{File.dirname(__FILE__)}/../..")
 
-          JsTestCore.spec_path.should == File.expand_path(expected_spec_path)
-          JsTestCore.root_path.should == File.expand_path(expected_root_path)
+          mock.instance_of(Thin::Runner).run!
+
+          stub.proxy(Rack::Builder).new do |builder|
+            mock.proxy(builder).use(JsTestCore::App)
+            stub.proxy(builder).use
+            mock(builder).run(is_a(JsTestCore::App))
+          end
+
+          server.cli(
+            "--framework-name", "screw-unit",
+            "--framework-path", "#{project_spec_dir}/example_framework",
+            "--root-path", "#{project_spec_dir}/example_root",
+            "--spec-path", "#{project_spec_dir}/example_spec"
+          )
         end
       end
 
-      context "when the spec_path is not a directory" do
+      context "when the --framework-name or --framework-path are not set" do
         it "raises an ArgumentError" do
-          mock(File).directory?("spec_path") {false}
-
           lambda do
-            Server.standalone_rackup(builder, "spec_path", nil)
+            server.cli
           end.should raise_error(ArgumentError)
-        end
-      end
-
-      context "when the root_path is not a directory" do
-        it "raises an ArgumentError" do
-          mock(File).directory?("spec_path") {true}
-          mock(File).directory?("root_path") {false}
 
           lambda do
-            Server.standalone_rackup(builder, "spec_path", "root_path")
+            server.cli("--framework-name", "screw-unit")
+          end.should raise_error(ArgumentError)
+
+          lambda do
+            server.cli("--framework-path", "/path/to/framework")
           end.should raise_error(ArgumentError)
         end
       end

@@ -12,7 +12,8 @@ module JsTestCore
       end
     end
 
-    attr_accessor :host, :port, :spec_path, :root_path, :framework_path
+    attr_reader :host, :port, :spec_path, :root_path, :framework_path, :framework_name
+    attr_writer :framework_path, :framework_name
 
     def initialize(params={})
       params = {
@@ -26,10 +27,29 @@ module JsTestCore
       @host = params[:host]
       @port = params[:port]
       @framework_path = params[:framework_path]
+      @framework_name = params[:framework_name]
+    end
+
+    def spec_path=(path)
+      validate_path(path)
+      @spec_path = path
+    end
+
+    def root_path=(path)
+      validate_path(path)
+      @spec_path = path
     end
 
     def root_url
       "http://#{host}:#{port}"
+    end
+
+    protected
+
+    def validate_path(path)
+      unless File.directory?(path)
+        raise ArgumentError, "#{path} must be a directory"
+      end
     end
   end
 end

@@ -18,9 +18,9 @@ class Spec::ExampleGroup
   attr_reader :framework_path, :spec_path, :root_path, :server, :connection
   before(:all) do
     dir = File.dirname(__FILE__)
-    @framework_path = File.expand_path("#{LIBRARY_ROOT_DIR}/spec/example_core")
-    @spec_path = File.expand_path("#{LIBRARY_ROOT_DIR}/spec/example_specs")
-    @root_path = File.expand_path("#{LIBRARY_ROOT_DIR}/spec/example_public")
+    @framework_path = File.expand_path("#{LIBRARY_ROOT_DIR}/spec/example_framework")
+    @spec_path = File.expand_path("#{LIBRARY_ROOT_DIR}/spec/example_spec")
+    @root_path = File.expand_path("#{LIBRARY_ROOT_DIR}/spec/example_root")
     stub(Thread).start.yields
   end
 

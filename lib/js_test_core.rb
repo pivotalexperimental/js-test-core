@@ -10,6 +10,7 @@ require "lucky_luciano"
 require "timeout"
 require "selenium/client"
 require "optparse"
+require "trollop"
 require "json"
 require "erector"
 
