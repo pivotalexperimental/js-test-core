@@ -6,8 +6,8 @@ module JsTestCore
       describe "Configuration" do
         attr_reader :doc
         before do
-          JsTestCore::Representations::Spec.project_js_files += ["/javascripts/test_file_1.js", "/javascripts/test_file_2.js"]
-          JsTestCore::Representations::Spec.project_css_files += ["/stylesheets/test_file_1.css", "/stylesheets/test_file_2.css"]
+          JsTestCore::Representations::Suite.project_js_files += ["/javascripts/test_file_1.js", "/javascripts/test_file_2.js"]
+          JsTestCore::Representations::Suite.project_css_files += ["/stylesheets/test_file_1.css", "/stylesheets/test_file_2.css"]
 
           response = get(SpecFile.path("/failing_spec"))
           response.should be_http( 200, {}, "" )
@@ -16,8 +16,8 @@ module JsTestCore
         end
 
         after do
-          JsTestCore::Representations::Spec.project_js_files.clear
-          JsTestCore::Representations::Spec.project_css_files.clear
+          JsTestCore::Representations::Suite.project_js_files.clear
+          JsTestCore::Representations::Suite.project_css_files.clear
         end
 
         it "renders project js files" do

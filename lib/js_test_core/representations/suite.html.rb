@@ -1,6 +1,6 @@
 module JsTestCore
   module Representations
-    class Spec < Page
+    class Suite < Page
       class << self
         def project_js_files
           @project_js_files ||= []

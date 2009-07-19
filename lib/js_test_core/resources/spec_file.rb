@@ -3,7 +3,7 @@ module JsTestCore
     class SpecFile < ::JsTestCore::Resources::File
       class << self
         def spec_representation_class
-          @spec_representation_class ||= JsTestCore::Representations::Spec
+          @spec_representation_class ||= JsTestCore::Representations::Suite
         end
 
         attr_writer :spec_representation_class

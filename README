@@ -4,4 +4,3 @@ JsTestCore provides a command line runner and html suite file generation for you
 == Current supported frameworks
 * Jasmine
 * Screw Unit
-* JSSpec
