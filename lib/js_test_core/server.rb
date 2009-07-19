@@ -22,7 +22,7 @@ module JsTestCore
         opt(
           :spec_path,
           "The path to the spec files. e.g. --spec-path=./specs",
-          :default => "./spec/javascript"
+          :default => "./spec/javascripts"
         )
         opt(
           :root_path,
@@ -30,11 +30,11 @@ module JsTestCore
           :default => "./public"
         )
       end
+
       JsTestCore.framework_name = opts[:framework_name]
       JsTestCore.framework_path = opts[:framework_path]
       JsTestCore.spec_path = opts[:spec_path]
       JsTestCore.root_path = opts[:root_path]
-
       STDOUT.puts "root-path is #{JsTestCore.root_path}"
       STDOUT.puts "spec-path is #{JsTestCore.spec_path}"
       start
