@@ -14,18 +14,17 @@ require "cgi"
 require "net/http"
 require "selenium/client"
 require "optparse"
+require "json"
 require "erector"
 
 require "#{dir}/js_test_core/configuration"
 
 require "#{dir}/js_test_core/extensions"
-require "#{dir}/js_test_core/models"
 require "#{dir}/js_test_core/resources"
 require "#{dir}/js_test_core/representations"
 require "#{dir}/js_test_core/server"
 
 require "#{dir}/js_test_core/client"
-require "#{dir}/js_test_core/selenium_server_configuration"
 
 require "#{dir}/js_test_core/app"
 

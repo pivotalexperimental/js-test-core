@@ -10,6 +10,9 @@ class FakeSeleniumDriver
     @session_id = SESSION_ID
   end
 
+  def get_eval(js)
+  end
+
   def stop
     @session_id = nil
   end
