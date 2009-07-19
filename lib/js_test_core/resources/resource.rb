@@ -5,7 +5,7 @@ module JsTestCore
       
       def spec_path; server.spec_path; end
       def root_path; server.root_path; end
-      def core_path; server.core_path; end
+      def framework_path; server.framework_path; end
       def root_url; server.root_url; end
 
       def server

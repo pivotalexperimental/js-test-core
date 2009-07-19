@@ -26,9 +26,9 @@ module JsTestCore
       end
     end
 
-    describe ".core_path" do
+    describe ".framework_path" do
       it "returns the expanded path to the JsTestCore core directory" do
-        Configuration.core_path.should == core_path
+        Configuration.framework_path.should == framework_path
       end
     end
 

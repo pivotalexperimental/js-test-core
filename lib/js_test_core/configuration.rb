@@ -12,7 +12,7 @@ module JsTestCore
       end
     end
 
-    attr_accessor :host, :port, :spec_path, :root_path, :core_path
+    attr_accessor :host, :port, :spec_path, :root_path, :framework_path
 
     def initialize(params={})
       params = {
@@ -25,7 +25,7 @@ module JsTestCore
       @root_path = ::File.expand_path(params[:root_path])
       @host = params[:host]
       @port = params[:port]
-      @core_path = params[:core_path]
+      @framework_path = params[:framework_path]
     end
 
     def root_url
