@@ -8,25 +8,25 @@ module JsTestCore
       @result = ""
     end
 
-    describe ".spec_root" do
+    describe "#spec_root" do
       it "returns the Dir " do
         Configuration.spec_path.should == spec_path
       end
     end
 
-    describe ".spec_path" do
+    describe "#spec_path" do
       it "returns the absolute path of the specs root directory" do
         Configuration.spec_path.should == spec_path
       end
     end
 
-    describe ".root_path" do
+    describe "#root_path" do
       it "returns the expanded path of the public path" do
         Configuration.root_path.should == root_path
       end
     end
 
-    describe ".framework_path" do
+    describe "#framework_path" do
       it "returns the expanded path to the JsTestCore core directory" do
         Configuration.framework_path.should == framework_path
       end

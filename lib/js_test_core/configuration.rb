@@ -12,8 +12,8 @@ module JsTestCore
       end
     end
 
-    attr_accessor :host, :port, :spec_path, :root_path, :framework_path, :framework_name
-    attr_writer :framework_path, :framework_name
+    attr_reader :host, :port, :spec_path, :root_path, :framework_path, :framework_name
+    attr_writer :host, :port, :framework_path, :framework_name
 
     def initialize(params={})
       params = {
@@ -28,6 +28,12 @@ module JsTestCore
       @port = params[:port]
       @framework_path = params[:framework_path]
       @framework_name = params[:framework_name]
+    end
+
+    def suite_representation_class
+      if framework_name
+        JsTestCore::Representations::Suites.const_get(framework_name.gsub("-", "_").camelcase)
+      end
     end
 
     def spec_path=(path)

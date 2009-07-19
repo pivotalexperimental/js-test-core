@@ -6,6 +6,7 @@ module JsTestCore
       describe "Configuration" do
         attr_reader :doc
         before do
+          JsTestCore.framework_name = "screw-unit"
           JsTestCore::Representations::Suite.project_js_files += ["/javascripts/test_file_1.js", "/javascripts/test_file_2.js"]
           JsTestCore::Representations::Suite.project_css_files += ["/stylesheets/test_file_1.css", "/stylesheets/test_file_2.css"]
 

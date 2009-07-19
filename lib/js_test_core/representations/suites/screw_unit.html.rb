@@ -85,8 +85,8 @@ module JsTestCore
 
                 ajax({
                   type: "POST",
-                  url: '#{ScrewUnit::Resources::SeleniumSession.path("/finish")}',
-                  data: {"text": error_text, "session_id": '#{session_id}'}
+                  url: '/',
+                  data: {"text": error_text}
                 });
               });
             })(jQuery);

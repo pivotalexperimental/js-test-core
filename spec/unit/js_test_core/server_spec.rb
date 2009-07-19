@@ -20,7 +20,7 @@ module JsTestCore
 
       
       context "when the --framework-name and --framework-path are set" do
-        it "starts the server" do
+        it "starts the server and sets SpecFile::suite_representation_class to be the ScrewUnit suite" do
           project_spec_dir = File.expand_path("#{File.dirname(__FILE__)}/../..")
 
           mock.proxy(Thin::Runner).new(["--port", "8081", "--rackup", rackup_path, "start"]) do |runner|
@@ -31,6 +31,7 @@ module JsTestCore
             mock.proxy(builder).use(JsTestCore::App)
             stub.proxy(builder).use
             mock(builder).run(is_a(JsTestCore::App))
+            mock(builder).run(is_a(Sinatra::Application))
           end
 
           server.cli(
@@ -40,6 +41,8 @@ module JsTestCore
             "--spec-path", "#{project_spec_dir}/example_spec",
             "--port", "8081"
           )
+
+          JsTestCore::Configuration.instance.suite_representation_class.should == JsTestCore::Representations::Suites::ScrewUnit
         end
       end
 

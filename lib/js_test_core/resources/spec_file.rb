@@ -1,14 +1,6 @@
 module JsTestCore
   module Resources
     class SpecFile < ::JsTestCore::Resources::File
-      class << self
-        def spec_representation_class
-          @spec_representation_class ||= JsTestCore::Representations::Suite
-        end
-
-        attr_writer :spec_representation_class
-      end
-
       map "/specs"
 
       get "/?" do
@@ -48,7 +40,7 @@ module JsTestCore
       end
 
       def render_spec(spec_files)
-        self.class.spec_representation_class.new(:spec_files => spec_files).to_s
+        JsTestCore.suite_representation_class.new(:spec_files => spec_files).to_s
       end
 
       def absolute_path

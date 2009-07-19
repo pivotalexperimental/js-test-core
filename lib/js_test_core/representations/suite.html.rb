@@ -3,14 +3,20 @@ module JsTestCore
     class Suite < Page
       class << self
         def project_js_files
-          @project_js_files ||= []
+          @@project_js_files ||= []
         end
-        attr_writer :project_js_files
+
+        def project_js_files=(files)
+          @@project_js_files = files
+        end
 
         def project_css_files
-          @project_css_files ||= []
+          @@project_css_files ||= []
         end
-        attr_writer :project_css_files
+
+        def project_css_files=(files)
+          @@project_css_files = files
+        end
       end
 
       needs :spec_files
