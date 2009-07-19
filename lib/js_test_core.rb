@@ -7,11 +7,7 @@ dir = File.dirname(__FILE__)
 $LOAD_PATH.unshift File.expand_path("#{dir}/../vendor/lucky-luciano/lib")
 require "lucky_luciano"
 
-require "fileutils"
-require "tmpdir"
 require "timeout"
-require "cgi"
-require "net/http"
 require "selenium/client"
 require "optparse"
 require "json"
@@ -23,9 +19,7 @@ require "#{dir}/js_test_core/extensions"
 require "#{dir}/js_test_core/resources"
 require "#{dir}/js_test_core/representations"
 require "#{dir}/js_test_core/server"
-
 require "#{dir}/js_test_core/client"
-
 require "#{dir}/js_test_core/app"
 
 module JsTestCore
