@@ -11,21 +11,21 @@ module JsTestCore
         ).run!
       end
 
-      def standalone_rackup(rack_builder, spec_root_path=nil, public_path=nil)
+      def standalone_rackup(rack_builder, spec_path=nil, root_path=nil)
         require "sinatra"
 
-        JsTestCore.spec_root_path = spec_root_path || File.expand_path("./spec/javascripts")
-        if File.directory?(JsTestCore.spec_root_path)
-          puts "Spec root path is #{JsTestCore.spec_root_path}"
+        JsTestCore.spec_path = spec_path || File.expand_path("./spec/javascripts")
+        if File.directory?(JsTestCore.spec_path)
+          puts "Spec root path is #{JsTestCore.spec_path}"
         else
-          raise ArgumentError, "#{spec_root_path} #{JsTestCore.spec_root_path} must be a directory"
+          raise ArgumentError, "#{spec_path} #{JsTestCore.spec_path} must be a directory"
         end
 
-        JsTestCore.public_path = public_path || File.expand_path("./public")
-        if File.directory?(JsTestCore.public_path)
-          puts "Public path is #{JsTestCore.public_path}"
+        JsTestCore.root_path = root_path || File.expand_path("./public")
+        if File.directory?(JsTestCore.root_path)
+          puts "Public path is #{JsTestCore.root_path}"
         else
-          raise ArgumentError, "#{public_path} #{JsTestCore.public_path} must be a directory"
+          raise ArgumentError, "#{root_path} #{JsTestCore.root_path} must be a directory"
         end
 
         rack_builder.use JsTestCore::App

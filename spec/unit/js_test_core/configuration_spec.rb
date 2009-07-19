@@ -10,19 +10,19 @@ module JsTestCore
 
     describe ".spec_root" do
       it "returns the Dir " do
-        Configuration.spec_root_path.should == spec_root_path
+        Configuration.spec_path.should == spec_path
       end
     end
 
-    describe ".spec_root_path" do
+    describe ".spec_path" do
       it "returns the absolute path of the specs root directory" do
-        Configuration.spec_root_path.should == spec_root_path
+        Configuration.spec_path.should == spec_path
       end
     end
 
-    describe ".public_path" do
+    describe ".root_path" do
       it "returns the expanded path of the public path" do
-        Configuration.public_path.should == public_path
+        Configuration.root_path.should == root_path
       end
     end
 

@@ -52,7 +52,7 @@ module JsTestCore
       end
 
       def absolute_path
-        @absolute_path ||= ::File.expand_path("#{spec_root_path}#{relative_path.gsub(%r{^/specs}, "")}")
+        @absolute_path ||= ::File.expand_path("#{spec_path}#{relative_path.gsub(%r{^/specs}, "")}")
       end
     end
   end

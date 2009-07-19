@@ -15,18 +15,18 @@ class Spec::ExampleGroup
   
   include Rack::Test::Methods
   include BeHttp
-  attr_reader :core_path, :spec_root_path, :public_path, :server, :connection
+  attr_reader :core_path, :spec_path, :root_path, :server, :connection
   before(:all) do
     dir = File.dirname(__FILE__)
     @core_path = File.expand_path("#{LIBRARY_ROOT_DIR}/spec/example_core")
-    @spec_root_path = File.expand_path("#{LIBRARY_ROOT_DIR}/spec/example_specs")
-    @public_path = File.expand_path("#{LIBRARY_ROOT_DIR}/spec/example_public")
+    @spec_path = File.expand_path("#{LIBRARY_ROOT_DIR}/spec/example_specs")
+    @root_path = File.expand_path("#{LIBRARY_ROOT_DIR}/spec/example_public")
     stub(Thread).start.yields
   end
 
   before(:each) do
-    JsTestCore::Configuration.instance.spec_root_path = spec_root_path
-    JsTestCore::Configuration.instance.public_path = public_path
+    JsTestCore::Configuration.instance.spec_path = spec_path
+    JsTestCore::Configuration.instance.root_path = root_path
     JsTestCore::Configuration.instance.core_path = core_path
   end
 

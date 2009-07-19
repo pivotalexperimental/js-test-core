@@ -23,7 +23,7 @@ module JsTestCore
       end
 
       def absolute_path
-        @absolute_path ||= ::File.expand_path("#{public_path}#{relative_path}")
+        @absolute_path ||= ::File.expand_path("#{root_path}#{relative_path}")
       end
 
       protected
