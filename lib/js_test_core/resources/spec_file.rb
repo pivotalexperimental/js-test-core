@@ -40,14 +40,11 @@ module JsTestCore
 
       def get_generated_spec(real_path, spec_files)
         html = render_spec(spec_files)
-        [
-          200,
-          {
-            'Content-Type' => "text/html",
-            'Last-Modified' => ::File.mtime(real_path).rfc822
-          },
-          html
-        ]
+        headers = {
+          'Content-Type' => "text/html",
+          'Last-Modified' => ::File.mtime(real_path).rfc822
+        }
+        [200, headers, html]
       end
 
       def render_spec(spec_files)
