@@ -13,7 +13,7 @@ module JsTestCore
         attr_writer :project_css_files
       end
 
-      needs :spec_files, :session_id
+      needs :spec_files
       protected
       def title_text
         "Js Test Core Suite"
@@ -29,11 +29,6 @@ module JsTestCore
         spec_files.each do |file|
           script :type => "text/javascript", :src => file
         end
-        script_to_set_window_session_id
-      end
-
-      def script_to_set_window_session_id
-        script "window._session_id = '#{session_id}';", :type => "text/javascript"
       end
 
       def project_js_files
