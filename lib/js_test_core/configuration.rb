@@ -12,7 +12,7 @@ module JsTestCore
       end
     end
 
-    attr_reader :host, :port, :spec_path, :root_path, :framework_path, :framework_name
+    attr_accessor :host, :port, :spec_path, :root_path, :framework_path, :framework_name
     attr_writer :framework_path, :framework_name
 
     def initialize(params={})
@@ -37,7 +37,7 @@ module JsTestCore
 
     def root_path=(path)
       validate_path(path)
-      @spec_path = path
+      @root_path = path
     end
 
     def root_url

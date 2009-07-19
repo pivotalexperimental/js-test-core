@@ -5,6 +5,12 @@ module JsTestCore
     FAILED_RUNNER_STATE = "failed"
     FINISHED_RUNNER_STATES = [PASSED_RUNNER_STATE, FAILED_RUNNER_STATE]
 
+    DEFAULT_SELENIUM_BROWSER = "*firefox"
+    DEFAULT_SELENIUM_HOST = "0.0.0.0"
+    DEFAULT_SELENIUM_PORT = 4444
+    DEFAULT_SPEC_URL = "http://localhost:8080/specs"
+    DEFAULT_TIMEOUT = 60
+
     class ClientException < Exception
     end
 
@@ -17,36 +23,39 @@ module JsTestCore
       end
 
       def run_argv(argv)
-        params = {}
-        parser = OptionParser.new do |o|
-          o.banner = "JsTestCore Runner"
-          o.banner << "\nUsage: #{$0} [options] [-- untouched arguments]"
-
-          o.on
-          o.on('-b', '--selenium_browser=selenium_browser', "The Selenium browser (e.g. *firefox). See http://selenium-rc.openqa.org/") do |selenium_browser|
-            params[:selenium_browser] = selenium_browser
-          end
-
-          o.on('-h', '--selenium_host=SELENIUM_HOST', "The host name of the Selenium Server relative to where this file is executed") do |host|
-            params[:selenium_host] = host
-          end
-
-          o.on('-p', '--selenium_port=SELENIUM_PORT', "The port of the Selenium Server relative to where this file is executed") do |port|
-            params[:selenium_port] = port
-          end
-
-          o.on('-u', '--spec_url=SPEC_URL', "The url of the js spec server, relative to the browsers running via the Selenium Server") do |spec_url|
-            params[:spec_url] = spec_url
-          end
-
-          o.on('-t', '--timeout=TIMEOUT', "The timeout limit of the test run") do |timeout|
-            params[:timeout] = Integer(timeout)
-          end
-
-          o.on_tail
+        opts = Trollop.options(argv) do
+          opt(
+            :selenium_browser,
+            "The Selenium browser (e.g. *firefox). See http://selenium-rc.openqa.org/",
+            :type => String,
+            :default => DEFAULT_SELENIUM_BROWSER
+          )
+          opt(
+            :selenium_host,
+            "The host name of the Selenium Server relative to where this file is executed",
+            :type => String,
+            :default => DEFAULT_SELENIUM_HOST
+          )
+          opt(
+            :selenium_port,
+            "The port of the Selenium Server relative to where this file is executed",
+            :type => Integer,
+            :default => DEFAULT_SELENIUM_PORT
+          )
+          opt(
+            :spec_url,
+            "The url of the js spec server, relative to the browsers running via the Selenium Server",
+            :type => String,
+            :default => DEFAULT_SPEC_URL
+          )
+          opt(
+            :timeout,
+            "The timeout limit of the test run",
+            :type => Integer,
+            :default => DEFAULT_TIMEOUT
+          )
         end
-        parser.order!(argv)
-        run params
+        run opts
       end
     end
 
@@ -73,11 +82,11 @@ module JsTestCore
     end
 
     def start_selenium_client
-      uri =  URI.parse(parameters[:spec_url] || "http://localhost:8080/specs")
+      uri =  URI.parse(parameters[:spec_url] || DEFAULT_SPEC_URL)
       @selenium_client = Selenium::Client::Driver.new(
-        :host => parameters[:selenium_host] || "0.0.0.0",
-        :port => parameters[:selenium_port] || 4444,
-        :browser => parameters[:selenium_browser] || "*firefox",
+        :host => parameters[:selenium_host] || DEFAULT_SELENIUM_HOST,
+        :port => parameters[:selenium_port] || DEFAULT_SELENIUM_PORT,
+        :browser => parameters[:selenium_browser] || DEFAULT_SELENIUM_BROWSER,
         :url => "#{uri.scheme}://#{uri.host}:#{uri.port}"
       )
       selenium_client.start

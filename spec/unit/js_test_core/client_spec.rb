@@ -131,40 +131,65 @@ module JsTestCore
       context "when passed-in Hash contains :selenium_browser" do
         it "passes the spec_url as a post parameter" do
           selenium_browser = '*iexplore'
-          mock(Client).run(:selenium_browser => selenium_browser)
-          client = Client.run_argv(['--selenium_browser', selenium_browser])
+          mock(Client).run(satisfy do |params|
+            default_params.merge(:selenium_browser => selenium_browser).
+              to_set.subset?(params.to_set)
+          end)
+          client = Client.run_argv(['--selenium-browser', selenium_browser])
         end
       end
 
       context "when passed-in Hash contains :spec_url" do
         it "passes the spec_url as a post parameter" do
           spec_url = 'http://foobar.com/foo'
-          mock(Client).run(:spec_url => spec_url)
-          client = Client.run_argv(['--spec_url', spec_url])
+          mock(Client).run(satisfy do |params|
+            default_params.merge(:spec_url => spec_url).
+              to_set.subset?(params.to_set)
+          end)
+          client = Client.run_argv(['--spec-url', spec_url])
         end
       end
 
       context "when passed-in Hash contains :selenium_host" do
         it "passes the selenium_host as a post parameter" do
           selenium_host = 'test-runner'
-          mock(Client).run(:selenium_host => selenium_host)
-          client = Client.run_argv(['--selenium_host', selenium_host])
+          mock(Client).run(satisfy do |params|
+            default_params.merge(:selenium_host => selenium_host).
+              to_set.subset?(params.to_set)
+          end)
+          client = Client.run_argv(['--selenium-host', selenium_host])
         end
       end
 
       context "when passed-in Hash contains :selenium_port" do
         it "passes the selenium_port as a post parameter" do
-          selenium_port = "5000"
-          mock(Client).run(:selenium_port => selenium_port)
-          client = Client.run_argv(['--selenium_port', selenium_port])
+          selenium_port = 5000
+          mock(Client).run(satisfy do |params|
+            default_params.merge(:selenium_port => selenium_port).
+              to_set.subset?(params.to_set)
+          end)
+          client = Client.run_argv(['--selenium-port', selenium_port.to_s])
         end
       end
 
       context "when passed-in Hash contains :timeout" do
         it "passes the timeout as a post parameter" do
-          mock(Client).run(:timeout => 5)
+          mock(Client).run(satisfy do |params|
+            default_params.merge(:timeout => 5).
+              to_set.subset?(params.to_set)
+          end)
           client = Client.run_argv(['--timeout', "5"])
         end
+      end
+
+      def default_params
+        {
+          :selenium_browser => "*firefox",
+          :selenium_host => "0.0.0.0",
+          :selenium_port => 4444,
+          :spec_url => "http://localhost:8080/specs",
+          :timeout => 60
+        }
       end
     end
   end
