@@ -9,6 +9,7 @@ module JsTestCore
           attr_writer :jquery_js_file
         end
 
+        attr_reader :spec_files
         needs :spec_files
         def title_text
           "Screw Unit suite"
