@@ -4,3 +4,5 @@ JsTestCore provides a command line runner and html suite file generation for you
 == Current supported frameworks
 * Jasmine
 * Screw Unit
+
+Copyright (c) 2010 Pivotal Labs. This software is licensed under the MIT License.
